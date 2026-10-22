@@ -14,7 +14,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import useLoginForm from "../hooks/useLoginForm";
-import useLogin, { LoginResult } from "../hooks/useLogin";
+import useLogin from "../hooks/useLogin";
 import { getErrorMessage } from "../../../../Utils/api.utils";
 
 import { AuthFooter } from "./AuthFooter";
@@ -56,12 +56,12 @@ export function LoginCard() {
 
   const onSubmit = async (data: { email: string; password: string }) => {
     try {
-      const res: LoginResult = await loginMutation.mutateAsync({
+      const res = await loginMutation.mutateAsync({
         email: data.email,
         password: data.password,
       });
 
-      const user = res?.data?.user || res?.user || res?.data;
+      const user = res?.data?.user || res?.user;
 
       if (user && user.role && user.role !== "admin") {
         toast.error("You are not authorized to access this portal.");

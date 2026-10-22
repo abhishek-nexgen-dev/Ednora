@@ -1,5 +1,3 @@
-import React from "react";
-
 const LoginPageFooter = () => {
   return (
     <footer className="relative z-10 mt-10 w-full max-w-5xl mx-auto border-t border-white/[0.08] pt-5">
