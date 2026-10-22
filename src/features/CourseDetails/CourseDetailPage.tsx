@@ -5,36 +5,56 @@ import CourseSidebar from "./v1/Components/CourseSidebar";
 import ProgramDescription from "./v1/Components/ProgramDescription";
 import useCourseStore from "../Course/v1/store/course.store";
 import api from "../../Utils/api.utils";
-import { Link } from "react-router-dom";
+import { BackendCourse } from "../../types/backend.types";
+import { Link, useSearchParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 
 export default function CourseDetailsPage() {
+  const [searchParams] = useSearchParams();
+  const requestedId = searchParams.get("id");
+
   const storeCourses = useCourseStore((state) => state.course);
   const [courses, setCourses] = useState(storeCourses);
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   useEffect(() => {
     if (storeCourses.length === 0) {
-      api.get("/api/v1/user/findAllCourse").then((res) => {
-        if (res.data?.data && Array.isArray(res.data.data)) {
-          setCourses(res.data.data);
-          useCourseStore.getState().setCourse(res.data.data);
-        }
-      }).catch(console.warn);
+      api
+        .get("/api/v1/user/findAllCourse")
+        .then((res) => {
+          if (res.data?.data && Array.isArray(res.data.data)) {
+            setCourses(res.data.data);
+            useCourseStore.getState().setCourse(res.data.data);
+            if (requestedId) {
+              const idx = res.data.data.findIndex(
+                (c: BackendCourse) => c._id === requestedId || c.courseCode === requestedId,
+              );
+              if (idx !== -1) setSelectedIndex(idx);
+            }
+          }
+        })
+        .catch(console.warn);
     } else {
       setCourses(storeCourses);
+      if (requestedId) {
+        const idx = storeCourses.findIndex(
+          (c: BackendCourse) => c._id === requestedId || c.courseCode === requestedId,
+        );
+        if (idx !== -1) setSelectedIndex(idx);
+      }
     }
-  }, [storeCourses]);
+  }, [storeCourses, requestedId]);
 
-  const activeCourse = courses[selectedIndex] || courses[0] || {
-    courseName: "Bachelor of Computer Applications (BCA)",
-    courseCode: "BCA-101",
-    Department: "Computer Science & Information Technology",
-    courseDuration: "3 Years",
-    duration: "3 Years",
-    mode: "Regular (Full Time)",
-    courseThumbnail: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1600",
-  };
+  const activeCourse = courses[selectedIndex] ||
+    courses[0] || {
+      courseName: "Bachelor of Computer Applications (BCA)",
+      courseCode: "BCA-101",
+      Department: "Computer Science & Information Technology",
+      courseDuration: "3 Years",
+      duration: "3 Years",
+      mode: "Regular (Full Time)",
+      courseThumbnail: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1600",
+    };
 
   return (
     <div className="w-full bg-[#07080C] text-white p-3.5 sm:p-6 lg:p-8">
@@ -50,8 +70,12 @@ export default function CourseDetailsPage() {
               <ArrowLeft size={16} />
             </Link>
             <div>
-              <span className="text-xs uppercase tracking-wider font-semibold text-indigo-400">Curriculum Syllabus</span>
-              <h2 className="text-base sm:text-lg font-bold text-white">Course Specification Dossier</h2>
+              <span className="text-xs uppercase tracking-wider font-semibold text-indigo-400">
+                Curriculum Syllabus
+              </span>
+              <h2 className="text-base sm:text-lg font-bold text-white">
+                Course Specification Dossier
+              </h2>
             </div>
           </div>
 
@@ -77,7 +101,11 @@ export default function CourseDetailsPage() {
         <CourseHero
           title={activeCourse.courseName}
           department={activeCourse.Department || "Computer Science & IT"}
-          image={activeCourse.courseThumbnail || activeCourse.image || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1600"}
+          image={
+            activeCourse.courseThumbnail ||
+            activeCourse.image ||
+            "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1600"
+          }
           duration={activeCourse.courseDuration || activeCourse.duration || "3 Years"}
           mode={activeCourse.mode || "Full Time"}
         />

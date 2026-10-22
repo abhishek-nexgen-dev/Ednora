@@ -8,7 +8,7 @@ export default defineConfig(async () => ({
   clearScreen: false,
   server: {
     host: "0.0.0.0",
-    port: 3000,
+    port: 1420,
     allowedHosts: true,
     proxy: {
       "/api": {
@@ -25,6 +25,17 @@ export default defineConfig(async () => ({
     },
     watch: {
       ignored: ["**/src-tauri/**"],
+    },
+  },
+  build: {
+    chunkSizeWarningLimit: 800,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ["react", "react-dom", "react-router-dom"],
+          icons: ["lucide-react", "react-icons"],
+        },
+      },
     },
   },
 }));

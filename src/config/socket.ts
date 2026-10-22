@@ -5,8 +5,7 @@ let socket: Socket | null = null;
 export const connectSocket = (token?: string): Socket => {
   if (socket?.connected) return socket;
 
-  const socketUrl =
-    import.meta.env.VITE_SOCKET_URL || "https://ciitm-backend.onrender.com";
+  const socketUrl = import.meta.env.VITE_SOCKET_URL || "https://ciitm-backend.onrender.com";
 
   socket = io(socketUrl, {
     transports: ["websocket", "polling"],

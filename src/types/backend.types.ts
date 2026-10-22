@@ -178,6 +178,18 @@ export interface BackendFrontendSettings {
   };
 }
 
+export interface BackendTestimonial {
+  _id: string;
+  name: string;
+  email: string;
+  image?: string;
+  message: string;
+  job_Role: string;
+  star: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface BackendQueueMetrics {
   connected: boolean;
   mode: string;

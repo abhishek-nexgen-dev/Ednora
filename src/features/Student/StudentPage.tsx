@@ -26,7 +26,8 @@ export default function StudentDirectoryPage() {
           }
         }
 
-        const defaultCourse = cRes.data?.data?.[0]?.courseName || "Bachelor of Computer Applications (BCA)";
+        const defaultCourse =
+          cRes.data?.data?.[0]?.courseName || "Bachelor of Computer Applications (BCA)";
         const sRes = await api.get("/api/v1/Student/FindByCourseAndSemester", {
           params: {
             course: defaultCourse,

@@ -11,7 +11,7 @@ const useCourseForm = () => {
       courseName: "",
       courseCode: "",
       courseDescription: "",
-      mode: "offline",
+      mode: "Hybrid",
       courseDuration: "",
       courseEligibility: "",
       coursePrice: 0,

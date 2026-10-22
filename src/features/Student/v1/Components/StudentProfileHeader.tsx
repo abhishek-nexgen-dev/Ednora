@@ -71,7 +71,9 @@ const StudentProfileHeader = () => {
               {/* Actions */}
               <div className="mt-5 flex flex-wrap gap-2.5 sm:gap-3">
                 <button
-                  onClick={() => toast.info(`Dossier records for ${student.uniqueId} synchronized.`)}
+                  onClick={() =>
+                    toast.info(`Dossier records for ${student.uniqueId} synchronized.`)
+                  }
                   className="
                     inline-flex
                     items-center
@@ -154,7 +156,10 @@ const StudentProfileHeader = () => {
           >
             <StatCard title="Attendance" value="94%" />
             <StatCard title="Current GPA" value="8.6" />
-            <StatCard title="Pending Dues" value={`₹${student.fee?.amount_due?.toLocaleString() ?? 0}`} />
+            <StatCard
+              title="Pending Dues"
+              value={`₹${student.fee?.amount_due?.toLocaleString() ?? 0}`}
+            />
           </div>
         </div>
       </Card>

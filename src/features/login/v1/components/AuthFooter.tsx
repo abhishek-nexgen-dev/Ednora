@@ -1,45 +1,57 @@
 import { toast } from "react-toastify";
+import { LifeBuoy, ShieldAlert, FileText } from "lucide-react";
 
 export function AuthFooter() {
   const showHelpdesk = () => {
-    toast.info("CIITM IT Helpdesk: Contact admin@ciitm.edu or Ext. 104 (Mon-Sat, 9AM-6PM IST)");
+    toast.info("CIITM IT Helpdesk: Contact support@ciitm.edu or Ext. 104 (Mon-Sat, 9AM-6PM IST)");
   };
 
   const showPolicy = (title: string) => {
-    toast.info(`${title}: CIITM IT Security Directive 2026. All operations are logged & audited.`);
+    toast.info(
+      `${title}: CIITM Security Directive 2026. All administrator access attempts are audited.`,
+    );
   };
 
   return (
-    <div className="mt-6 sm:mt-8 space-y-3.5 text-center">
-      <p className="text-xs sm:text-sm text-zinc-400">
-        Authentication issues?
+    <div className="mt-6 space-y-3.5 text-center">
+      <div className="flex items-center justify-center gap-1.5 text-xs text-zinc-400">
+        <LifeBuoy size={14} className="text-indigo-400" />
+        <span>Authentication assistance?</span>
         <button
           type="button"
           onClick={showHelpdesk}
-          className="ml-1.5 font-medium text-indigo-400 hover:text-indigo-300 underline underline-offset-2"
+          className="font-medium text-indigo-400 hover:text-indigo-300 underline underline-offset-4 transition"
         >
-          Contact ERP Helpdesk
+          Contact IT Helpdesk
         </button>
-      </p>
+      </div>
 
-      <div className="flex flex-wrap justify-center gap-3 sm:gap-4 text-[11px] sm:text-xs text-zinc-500">
+      <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[11px] text-zinc-500">
         <button
           type="button"
-          onClick={() => showPolicy("Privacy Policy")}
-          className="hover:text-zinc-300 transition"
+          onClick={() => showPolicy("Privacy & Telemetry Policy")}
+          className="hover:text-zinc-300 flex items-center gap-1 transition"
         >
-          Privacy Policy
+          <ShieldAlert size={12} className="text-zinc-600" />
+          <span>Security Policy</span>
         </button>
-        <span>•</span>
+        <span aria-hidden="true" className="text-zinc-800">
+          •
+        </span>
         <button
           type="button"
-          onClick={() => showPolicy("Terms of Service")}
-          className="hover:text-zinc-300 transition"
+          onClick={() => showPolicy("Master Institutional Service Agreement")}
+          className="hover:text-zinc-300 flex items-center gap-1 transition"
         >
-          Institutional Terms
+          <FileText size={12} className="text-zinc-600" />
+          <span>Terms of Use</span>
         </button>
-        <span>•</span>
-        <span className="font-mono text-emerald-400/80">TLS 1.3</span>
+        <span aria-hidden="true" className="text-zinc-800">
+          •
+        </span>
+        <span className="font-mono text-emerald-400/90 text-[10px] bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+          GATEWAY v4.2
+        </span>
       </div>
     </div>
   );

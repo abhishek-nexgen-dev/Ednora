@@ -27,10 +27,13 @@ export function StudentRow({ student }: Props) {
   const firstName = student.student?.firstName || "Student";
   const lastName = student.student?.lastName || "";
   const initial = firstName.charAt(0).toUpperCase();
-  const dob = student.student?.dateOfBirth ? String(student.student.dateOfBirth).slice(0, 10) : "N/A";
+  const dob = student.student?.dateOfBirth
+    ? String(student.student.dateOfBirth).slice(0, 10)
+    : "N/A";
   const email = student.student?.email ? student.student.email.join(", ") : "N/A";
   const phone = student.student?.contactNumber || "N/A";
-  const feePaid = student.fee?.amount_paid !== undefined ? `₹${student.fee.amount_paid.toLocaleString()}` : "₹0";
+  const feePaid =
+    student.fee?.amount_paid !== undefined ? `₹${student.fee.amount_paid.toLocaleString()}` : "₹0";
 
   return (
     <tr className="border-b border-zinc-800 hover:bg-zinc-900/40 transition-colors">

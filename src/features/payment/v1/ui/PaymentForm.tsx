@@ -15,7 +15,9 @@ function PaymentForm() {
   const notesId = useId();
 
   const student = useStudentStore((state: { students: Student[] }) => state.students[0]);
-  const updateStudent = useStudentStore((state: { updateStudent: (student: Student) => void }) => state.updateStudent);
+  const updateStudent = useStudentStore(
+    (state: { updateStudent: (student: Student) => void }) => state.updateStudent,
+  );
 
   const [feeType, setFeeType] = useState<FeeType>(FEE_TYPES[0]);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(PAYMENT_METHODS[0]);
@@ -46,9 +48,11 @@ function PaymentForm() {
       try {
         await api.patch("/api/v1/Student/FeeUpdate", {
           uniqueId: student.uniqueId,
+          Paid_amount: numAmount,
+          PaymentType: feeType,
+          paymentMethod,
           amount: numAmount,
           feeType,
-          paymentMethod,
           notes,
         });
 
@@ -86,7 +90,9 @@ function PaymentForm() {
     >
       <div className="flex items-center justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.24em] text-violet-300/80">Fee collection action</p>
+          <p className="text-xs uppercase tracking-[0.24em] text-violet-300/80">
+            Fee collection action
+          </p>
           <h3 className="mt-1 text-xl font-semibold text-white">Record Tuition Payment</h3>
         </div>
 

@@ -1,8 +1,7 @@
 import axios from "axios";
 import useAuthStorage from "../features/login/v1/hooks/useAuthStorage";
 
-export const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "https://ciitm-backend.onrender.com";
+export const API_BASE_URL = import.meta.env.VITE_API_URL || "https://ciitm-backend.onrender.com";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -37,5 +36,13 @@ api.interceptors.response.use(
     return Promise.reject(error);
   },
 );
+
+export function getErrorMessage(error: unknown, fallback = "An unexpected error occurred"): string {
+  if (typeof error === "object" && error !== null) {
+    const err = error as { response?: { data?: { message?: string } }; message?: string };
+    return err.response?.data?.message || err.message || fallback;
+  }
+  return typeof error === "string" ? error : fallback;
+}
 
 export default api;

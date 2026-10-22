@@ -1,21 +1,33 @@
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import {
+  Building2,
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  ShieldCheck,
+  KeyRound,
+  Sparkles,
+  ArrowRight,
+  CheckCircle2,
+} from "lucide-react";
 import useLoginForm from "../hooks/useLoginForm";
 import useLogin from "../hooks/useLogin";
-import { Building2, Mail, Lock, Eye, EyeOff, ShieldCheck, KeyRound } from "lucide-react";
-import { SocialLogin } from "./SocialLogin";
-import { SecurityBadges } from "./SecurityBadges";
+import { getErrorMessage } from "../../../../Utils/api.utils";
+
 import { AuthFooter } from "./AuthFooter";
 import Input from "../../../../Components/Input";
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
 import useAuthStorage from "../hooks/useAuthStorage";
 
 export function LoginCard() {
   const { watch, setValue, formState, handleSubmit } = useLoginForm();
   const { errors } = formState;
-  const [email, setEmail] = useState(watch("email"));
-  const [password, setPassword] = useState(watch("password"));
+  const [email, setEmail] = useState(watch("email") || "");
+  const [password, setPassword] = useState(watch("password") || "");
   const [showPassword, setShowPassword] = useState(false);
+  const [autofilled, setAutofilled] = useState(false);
 
   const loginMutation = useLogin();
   const navigate = useNavigate();
@@ -38,15 +50,16 @@ export function LoginCard() {
 
     setEmail(TEST_CREDENTIALS.email);
     setPassword(TEST_CREDENTIALS.password);
-    toast.info("Demo credentials loaded! Click 'Sign In' to proceed.");
+    setAutofilled(true);
+    toast.info("Demo credentials loaded! Click 'Sign In to Terminal' to proceed.");
   };
 
   const onSubmit = async (data: { email: string; password: string }) => {
     try {
-      const res = (await loginMutation.mutateAsync({
+      const res = await loginMutation.mutateAsync({
         email: data.email,
         password: data.password,
-      })) as { data?: { user?: { role?: string } }; user?: { role?: string } } | undefined;
+      });
 
       const user = res?.data?.user || res?.user;
 
@@ -55,26 +68,27 @@ export function LoginCard() {
         return;
       }
 
-      toast.success("Credentials clearance verified! Entering dashboard...");
+      toast.success("Credentials clearance verified! Entering terminal...");
 
       setTimeout(() => {
         navigate("/dashboard");
-      }, 700);
+      }, 600);
     } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
-      toast.error(err?.response?.data?.message || "Login failed. Please check your credentials.");
+      toast.error(getErrorMessage(error, "Login failed. Please check your credentials."));
     }
   };
 
   return (
-    <div className="w-full max-w-md rounded-3xl border border-zinc-800/90 bg-[#0A0B10]/95 backdrop-blur-2xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8)] p-6 sm:p-8 relative overflow-hidden">
-      {/* Top subtle highlight glow */}
-      <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+    <div className="w-full max-w-md rounded-3xl border border-zinc-800/90 bg-[#0A0B10]/95 backdrop-blur-2xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85)] p-6 sm:p-8 relative overflow-hidden transition-all duration-300">
+      {/* Top subtle highlight glow line & ambient light */}
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-indigo-500 to-transparent" />
+      <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-56 h-56 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
 
+      {/* Card Header */}
       <Header />
 
       {/* Demo Credentials Quick Fill Banner */}
-      <div className="mt-6 rounded-2xl border border-indigo-500/30 bg-gradient-to-r from-indigo-950/40 via-zinc-900/60 to-zinc-900/40 p-3 sm:p-3.5 flex items-center justify-between gap-3">
+      <div className="mt-6 rounded-2xl border border-indigo-500/30 bg-gradient-to-r from-indigo-950/40 via-zinc-900/60 to-zinc-900/40 p-3 sm:p-3.5 flex items-center justify-between gap-3 shadow-inner">
         <div className="flex items-center gap-2.5 min-w-0">
           <div className="h-8 w-8 rounded-xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shrink-0">
             <KeyRound size={15} />
@@ -85,20 +99,33 @@ export function LoginCard() {
               <span className="text-[10px] font-mono text-indigo-300 bg-indigo-500/20 px-1.5 py-0.2 rounded border border-indigo-500/30">
                 SuperAdmin
               </span>
+              {autofilled && (
+                <span className="flex items-center text-[10px] text-emerald-400 font-semibold gap-0.5">
+                  <CheckCircle2 size={11} /> Loaded
+                </span>
+              )}
             </div>
-            <p className="text-[11px] text-zinc-400 font-mono truncate">admin@gmail.com • Admin@123</p>
+            <p className="text-[11px] text-zinc-400 font-mono truncate">
+              admin@gmail.com • Admin@123
+            </p>
           </div>
         </div>
 
         <button
           type="button"
           onClick={fillTestCredentials}
-          className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-sm transition active:scale-95 shrink-0"
+          className="group px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-sm transition-all duration-150 active:scale-95 shrink-0 flex items-center gap-1.5"
+          title="Autofill standard test credentials"
         >
-          Autofill
+          <Sparkles
+            size={12}
+            className="text-indigo-200 transition-transform group-hover:rotate-12"
+          />
+          <span>Autofill</span>
         </button>
       </div>
 
+      {/* Login Form */}
       <form className="space-y-4 sm:space-y-5 mt-6" onSubmit={handleSubmit(onSubmit)}>
         <Input
           name="email"
@@ -113,6 +140,7 @@ export function LoginCard() {
           }}
           error={errors.email?.message}
           readonly={false}
+          autoComplete="email"
         />
 
         <Input
@@ -128,6 +156,7 @@ export function LoginCard() {
               onClick={() => setShowPassword(!showPassword)}
               className="text-zinc-500 hover:text-zinc-300 p-1 focus:outline-none transition"
               title={showPassword ? "Hide password" : "Show password"}
+              aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
@@ -138,6 +167,7 @@ export function LoginCard() {
           }}
           error={errors.password?.message}
           readonly={false}
+          autoComplete="current-password"
         />
 
         <Options />
@@ -145,10 +175,7 @@ export function LoginCard() {
         <SignInButton loading={loginMutation.isPending} />
       </form>
 
-      <SocialLogin />
-
-      <SecurityBadges />
-
+      {/* Helpdesk & Legal Footer */}
       <AuthFooter />
     </div>
   );
@@ -157,7 +184,7 @@ export function LoginCard() {
 function Header() {
   return (
     <div className="text-center">
-      <div className="mx-auto flex h-14 w-14 sm:h-16 sm:w-16 text-white items-center justify-center rounded-2xl border border-indigo-500/30 bg-gradient-to-br from-indigo-500/20 to-indigo-600/30 shadow-lg shadow-indigo-500/20">
+      <div className="mx-auto flex h-14 w-14 sm:h-16 sm:w-16 text-white items-center justify-center rounded-2xl border border-indigo-500/30 bg-gradient-to-br from-indigo-500/20 via-indigo-600/10 to-violet-600/20 shadow-lg shadow-indigo-500/20">
         <Building2 size={28} className="text-indigo-400" />
       </div>
 
@@ -166,7 +193,7 @@ function Header() {
       </h1>
 
       <p className="mt-1 text-xs sm:text-sm text-zinc-400">
-        Institutional Governance & Administrative Portal
+        Institutional Governance & Administrative Terminal
       </p>
     </div>
   );
@@ -182,19 +209,19 @@ function Options() {
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm">
-      <label className="flex items-center gap-2 text-zinc-400 cursor-pointer select-none">
+      <label className="flex items-center gap-2 text-zinc-400 hover:text-zinc-300 cursor-pointer select-none transition">
         <input
           type="checkbox"
           checked={isRememberMe}
           onChange={handleRememberMeChange}
-          className="h-4 w-4 rounded border-zinc-700 bg-zinc-900 text-indigo-600 focus:ring-0 focus:ring-offset-0"
+          className="h-4 w-4 rounded border-zinc-700 bg-zinc-900 text-indigo-600 focus:ring-0 focus:ring-offset-0 cursor-pointer"
         />
-        Remember session
+        <span>Remember this workstation</span>
       </label>
 
       <Link
         to="/forgot-password"
-        className="font-medium text-indigo-400 hover:text-indigo-300 transition"
+        className="font-medium text-indigo-400 hover:text-indigo-300 transition underline-offset-4 hover:underline"
       >
         Forgot Password?
       </Link>
@@ -208,17 +235,18 @@ function SignInButton({ loading }: { loading?: boolean }) {
       type="submit"
       disabled={loading}
       className="
+      group
       h-12
       w-full
       rounded-xl
-      bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400
+      bg-gradient-to-r from-indigo-600 via-indigo-500 to-indigo-600 hover:from-indigo-500 hover:to-indigo-400
       font-semibold
       text-xs sm:text-sm
       text-white
       shadow-xl shadow-indigo-600/25
-      transition-all
+      transition-all duration-200
       active:scale-[0.99]
-      disabled:opacity-60
+      disabled:opacity-60 disabled:cursor-not-allowed
       flex items-center justify-center gap-2
     "
     >
@@ -229,8 +257,15 @@ function SignInButton({ loading }: { loading?: boolean }) {
         </>
       ) : (
         <>
-          <ShieldCheck size={17} />
-          <span>Sign In to Portal</span>
+          <ShieldCheck
+            size={17}
+            className="text-indigo-200 transition-transform group-hover:scale-110"
+          />
+          <span>Sign In to Terminal</span>
+          <ArrowRight
+            size={15}
+            className="text-indigo-300 transition-transform group-hover:translate-x-0.5"
+          />
         </>
       )}
     </button>
