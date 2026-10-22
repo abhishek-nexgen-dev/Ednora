@@ -96,7 +96,9 @@ function StudentProfileCard() {
           <div className="rounded-2xl border border-white/5 bg-black/20 p-4 text-left">
             <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">Semester</p>
 
-            <p className="mt-2 text-xs sm:text-sm font-medium text-white">Semester {student.semester || 1}</p>
+            <p className="mt-2 text-xs sm:text-sm font-medium text-white">
+              Semester {student.semester || 1}
+            </p>
           </div>
 
           <div className="rounded-2xl border border-white/5 bg-black/20 p-4 text-left col-span-2">
@@ -104,7 +106,9 @@ function StudentProfileCard() {
 
             <p className="mt-2 flex items-center gap-2 text-xs sm:text-sm font-medium text-white truncate">
               <Mail size={15} className="text-zinc-400 shrink-0" />
-              <span className="truncate">{student.student.email ? student.student.email[0] : "N/A"}</span>
+              <span className="truncate">
+                {student.student.email ? student.student.email[0] : "N/A"}
+              </span>
             </p>
           </div>
 

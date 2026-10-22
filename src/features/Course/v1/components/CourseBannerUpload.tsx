@@ -60,9 +60,16 @@ export function CourseBannerUpload({ onImageChange }: CourseBannerUploadProps) {
             <>
               <ImagePlus size={44} className="text-indigo-400" />
 
-              <p className="mt-3 font-semibold text-white text-sm sm:text-base">Upload Course Banner Image</p>
+              <p className="mt-3 font-semibold text-white text-sm sm:text-base">
+                Upload Course Banner Image
+              </p>
 
-              <p className={clsx("mt-1 text-xs", errors.courseImage?.message ? "text-red-400" : "text-zinc-500")}>
+              <p
+                className={clsx(
+                  "mt-1 text-xs",
+                  errors.courseImage?.message ? "text-red-400" : "text-zinc-500",
+                )}
+              >
                 {errors.courseImage
                   ? errors.courseImage.message
                   : "Click to select banner. Recommended: 1200x600px. Max size: 5MB."}

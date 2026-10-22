@@ -43,7 +43,9 @@ const CourseTable: React.FC = () => {
                     {c.courseCode}
                   </span>
                   <h3 className="font-bold text-sm text-white mt-1.5">{c.courseName}</h3>
-                  <p className="text-xs text-zinc-500">{c.Department || "Engineering & Technology"}</p>
+                  <p className="text-xs text-zinc-500">
+                    {c.Department || "Engineering & Technology"}
+                  </p>
                 </div>
 
                 <span className="font-mono text-xs font-bold text-emerald-400 shrink-0">
@@ -52,7 +54,12 @@ const CourseTable: React.FC = () => {
               </div>
 
               <div className="text-xs text-zinc-400 flex items-center justify-between bg-zinc-900/60 p-2.5 rounded-xl border border-zinc-800/60">
-                <span>Duration: <strong className="text-zinc-200">{c.duration || c.courseDuration || "3 Years"}</strong></span>
+                <span>
+                  Duration:{" "}
+                  <strong className="text-zinc-200">
+                    {c.duration || c.courseDuration || "3 Years"}
+                  </strong>
+                </span>
                 <span className="capitalize">{c.mode || "Regular"}</span>
               </div>
 
@@ -92,9 +99,7 @@ const CourseTable: React.FC = () => {
           </thead>
           <tbody className="divide-y divide-zinc-900">
             {course.length > 0 ? (
-              course.map((c) => (
-                <CourseTableRow key={c.courseCode} course={c} />
-              ))
+              course.map((c) => <CourseTableRow key={c.courseCode} course={c} />)
             ) : (
               <tr>
                 <td colSpan={5} className="py-12 text-center text-zinc-500">

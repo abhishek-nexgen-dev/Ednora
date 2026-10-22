@@ -6,7 +6,14 @@ import FeeProgressCard from "./ui/FeeProgressCard";
 import PaymentForm from "./ui/PaymentForm";
 import FeeBreakdownCard from "./ui/FeeBreakdownCard";
 import PaymentTimeline from "./ui/PaymentTimeline";
-import { Sparkles, Wallet, CircleDollarSign, BadgePercent, ReceiptText, Download } from "lucide-react";
+import {
+  Sparkles,
+  Wallet,
+  CircleDollarSign,
+  BadgePercent,
+  ReceiptText,
+  Download,
+} from "lucide-react";
 import { PAYMENT_SUMMARY_METRICS } from "./config/payment.config";
 import useStudentStore from "../../Course/v1/store/student.store";
 import api from "../../../Utils/api.utils";
@@ -38,7 +45,11 @@ const PaymentPage = () => {
                 Limit: 1,
               },
             });
-            if (courseRes.data?.data && Array.isArray(courseRes.data.data) && courseRes.data.data.length > 0) {
+            if (
+              courseRes.data?.data &&
+              Array.isArray(courseRes.data.data) &&
+              courseRes.data.data.length > 0
+            ) {
               setStudents([courseRes.data.data[0]]);
             }
           } catch (e) {
@@ -84,7 +95,8 @@ const PaymentPage = () => {
                   Student Fee Billing & Tuition Ledger
                 </h1>
                 <p className="mt-2 text-sm text-zinc-400 leading-relaxed">
-                  Lookup enrollment balances, record manual challan and bank draft payments, and verify online payment callbacks.
+                  Lookup enrollment balances, record manual challan and bank draft payments, and
+                  verify online payment callbacks.
                 </p>
               </div>
             </div>
