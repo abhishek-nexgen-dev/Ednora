@@ -2,19 +2,25 @@
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "ciitm-desktop",
   "version": "0.1.0",
-  "identifier": "com.developera.ciitm-desktop",
+  "identifier": "com.ciitm.desktop",
   "build": {
-    "beforeDevCommand": "pnpm dev",
-    "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "pnpm build",
+    "beforeDevCommand": "pnpm dev || npm run dev",
+    "devUrl": "http://localhost:3000",
+    "beforeBuildCommand": "pnpm build || npm run build",
     "frontendDist": "../dist"
   },
   "app": {
     "windows": [
       {
-        "title": "ciitm-desktop",
-        "width": 800,
-        "height": 600
+        "label": "main",
+        "title": "CIITM Enterprise ERP",
+        "width": 1280,
+        "height": 800,
+        "minWidth": 960,
+        "minHeight": 600,
+        "resizable": true,
+        "center": true,
+        "fullscreen": false
       }
     ],
     "security": {
@@ -30,6 +36,9 @@
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ]
+    ],
+    "category": "Education",
+    "shortDescription": "CIITM Campus ERP & Administration Desktop Client",
+    "longDescription": "Central Institute of Information Technology & Management Institutional ERP Desktop System for academic administration, admissions, fees, faculty, and circulars."
   }
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { connectSocket, disconnectSocket } from "../config/socket";
 import { SocketContext } from "./SocketContext";
 
@@ -11,5 +11,3 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 
   return <SocketContext.Provider value={{ socket }}>{children}</SocketContext.Provider>;
 }
-
-export default SocketProvider;

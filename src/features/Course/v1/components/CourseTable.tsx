@@ -24,7 +24,7 @@ const CourseTable: React.FC = () => {
   };
 
   const handleDelete = (id: string, name: string) => {
-    if (confirm(`Are you sure you want to delete course ${name}?`)) {
+    if (window.confirm(`Are you sure you want to delete course ${name}?`)) {
       removeCourse(id);
       toast.success(`Course ${name} deleted.`);
     }

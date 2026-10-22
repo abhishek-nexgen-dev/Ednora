@@ -16,7 +16,7 @@ import {
   Users,
 } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
-import api, { getErrorMessage } from "../../Utils/api.utils";
+import api from "../../Utils/api.utils";
 import { BackendNotice } from "../../types/backend.types";
 
 export default function NoticesPage() {
@@ -48,9 +48,10 @@ export default function NoticesPage() {
       } else {
         setNotices([]);
       }
-    } catch (err: unknown) {
-      console.warn("Error fetching notices:", err);
-      toast.error(getErrorMessage(err, "Failed to load circulars from server."));
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      console.warn("Error fetching notices:", error);
+      toast.error(err?.response?.data?.message || "Failed to load circulars from server.");
     } finally {
       setLoading(false);
     }
@@ -130,9 +131,10 @@ Website: https://ciitm.in | Email: contact@ciitm.edu`;
         file: null,
       });
       loadNotices();
-    } catch (err: unknown) {
-      console.error("Create notice error:", err);
-      toast.error(getErrorMessage(err, "Failed to broadcast circular."));
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      console.error("Create notice error:", error);
+      toast.error(err?.response?.data?.message || "Failed to broadcast circular.");
     } finally {
       setIsSubmitting(false);
     }
@@ -190,8 +192,7 @@ Website: https://ciitm.in | Email: contact@ciitm.edu`;
               Institutional Notices & Broadcasts
             </h1>
             <p className="text-xs sm:text-sm text-zinc-400 mt-1">
-              Issue examination schedules, statutory holidays, fee deadlines, and emergency alerts
-              directly via the backend.
+              Issue examination schedules, statutory holidays, fee deadlines, and emergency alerts directly via the backend.
             </p>
           </div>
 
@@ -217,10 +218,7 @@ Website: https://ciitm.in | Email: contact@ciitm.edu`;
         {/* Filter and Search Bar */}
         <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 sm:gap-4 bg-zinc-950/70 p-3 sm:p-4 rounded-2xl border border-zinc-800">
           <div className="relative flex-1">
-            <Search
-              size={16}
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500"
-            />
+            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" />
             <input
               type="text"
               placeholder="Search circulars, examination orders, holidays, syllabus updates..."
@@ -271,8 +269,8 @@ Website: https://ciitm.in | Email: contact@ciitm.edu`;
                   day: "numeric",
                 })
               : notice.date
-                ? new Date(notice.date).toLocaleDateString()
-                : "Active";
+              ? new Date(notice.date).toLocaleDateString()
+              : "Active";
 
             const hasDoc = Boolean(notice.doc_link || notice.fileUrl);
 
@@ -312,9 +310,7 @@ Website: https://ciitm.in | Email: contact@ciitm.edu`;
                     </h3>
 
                     <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed max-w-4xl line-clamp-3">
-                      {notice.content ||
-                        notice.noticeContent ||
-                        "No detailed instructions provided."}
+                      {notice.content || notice.noticeContent || "No detailed instructions provided."}
                     </p>
                   </div>
 
@@ -356,13 +352,10 @@ Website: https://ciitm.in | Email: contact@ciitm.edu`;
             <div className="text-center py-16 text-zinc-500 rounded-3xl border border-zinc-900 bg-zinc-950/40 space-y-2">
               <Megaphone size={36} className="mx-auto text-zinc-600 mb-2" />
               <p className="text-sm font-medium text-zinc-300">
-                {loading
-                  ? "Fetching circulars from database..."
-                  : "No campus circulars match current filters."}
+                {loading ? "Fetching circulars from database..." : "No campus circulars match current filters."}
               </p>
               <p className="text-xs text-zinc-500">
-                Use the 'Broadcast Circular' button to publish official administrative
-                notifications.
+                Use the 'Broadcast Circular' button to publish official administrative notifications.
               </p>
             </div>
           )}
@@ -415,9 +408,7 @@ Website: https://ciitm.in | Email: contact@ciitm.edu`;
                 <div className="flex items-center gap-2">
                   <FileText size={18} className="text-indigo-400" />
                   <div>
-                    <p className="text-xs font-semibold text-white">
-                      Attached Institutional Document
-                    </p>
+                    <p className="text-xs font-semibold text-white">Attached Institutional Document</p>
                     <p className="text-[11px] text-zinc-400 font-mono truncate max-w-xs">
                       {selectedNotice.doc_link || selectedNotice.fileUrl}
                     </p>
@@ -463,9 +454,7 @@ Website: https://ciitm.in | Email: contact@ciitm.edu`;
                 <span className="text-xs uppercase tracking-wider font-semibold text-indigo-400">
                   Campus Broadcast Engine
                 </span>
-                <h2 className="text-lg sm:text-xl font-bold text-white mt-1">
-                  Issue Official Circular
-                </h2>
+                <h2 className="text-lg sm:text-xl font-bold text-white mt-1">Issue Official Circular</h2>
               </div>
               <button
                 onClick={() => setIsCreateModalOpen(false)}
@@ -477,9 +466,7 @@ Website: https://ciitm.in | Email: contact@ciitm.edu`;
 
             <form onSubmit={handleCreateNotice} className="space-y-3.5">
               <div>
-                <label className="text-xs font-medium text-zinc-400">
-                  Circular Headline / Subject *
-                </label>
+                <label className="text-xs font-medium text-zinc-400">Circular Headline / Subject *</label>
                 <input
                   type="text"
                   required
@@ -530,9 +517,7 @@ Website: https://ciitm.in | Email: contact@ciitm.edu`;
               </div>
 
               <div>
-                <label className="text-xs font-medium text-zinc-400">
-                  Circular Body & Instructions *
-                </label>
+                <label className="text-xs font-medium text-zinc-400">Circular Body & Instructions *</label>
                 <textarea
                   required
                   rows={4}
@@ -559,8 +544,7 @@ Website: https://ciitm.in | Email: contact@ciitm.edu`;
                   className="w-full mt-1 px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-zinc-400 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500"
                 />
                 <p className="text-[11px] text-zinc-500 mt-1">
-                  If left empty, an official formatted text memo is generated automatically for
-                  backend storage.
+                  If left empty, an official formatted text memo is generated automatically for backend storage.
                 </p>
               </div>
 

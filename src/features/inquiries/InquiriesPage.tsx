@@ -13,7 +13,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
-import api, { getErrorMessage } from "../../Utils/api.utils";
+import api from "../../Utils/api.utils";
 import { BackendContactInquiry } from "../../types/backend.types";
 
 export default function InquiriesPage() {
@@ -42,9 +42,10 @@ export default function InquiriesPage() {
       } else {
         setInquiries([]);
       }
-    } catch (err: unknown) {
-      console.warn("Error fetching inquiries:", err);
-      toast.error(getErrorMessage(err, "Failed to load inquiries from server."));
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      console.warn("Error fetching inquiries:", error);
+      toast.error(err?.response?.data?.message || "Failed to load inquiries from server.");
     } finally {
       setLoading(false);
     }
@@ -64,28 +65,22 @@ export default function InquiriesPage() {
   });
 
   const handleDelete = async (id: string, name: string) => {
-    if (
-      !window.confirm(`Are you sure you want to delete inquiry from ${name || "this applicant"}?`)
-    )
-      return;
+    if (!window.confirm(`Are you sure you want to delete inquiry from ${name || "this applicant"}?`)) return;
     try {
       setInquiries((prev) => prev.filter((inq) => inq._id !== id));
       await api.delete(`/api/v1/contact/admin/deleteContact/${id}`);
       toast.success("Inquiry removed from database.");
       loadInquiries();
-    } catch (err: unknown) {
-      toast.error(getErrorMessage(err, "Failed to delete inquiry."));
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      toast.error(err?.response?.data?.message || "Failed to delete inquiry.");
       loadInquiries();
     }
   };
 
   const handleCreateInquiry = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (
-      !newInquiryForm.cName.trim() ||
-      !newInquiryForm.cEmail.trim() ||
-      !newInquiryForm.cMessage.trim()
-    ) {
+    if (!newInquiryForm.cName.trim() || !newInquiryForm.cEmail.trim() || !newInquiryForm.cMessage.trim()) {
       toast.error("Please fill in applicant name, email, and message.");
       return;
     }
@@ -109,8 +104,9 @@ export default function InquiriesPage() {
       setIsNewInquiryModalOpen(false);
       setNewInquiryForm({ cName: "", cEmail: "", cNumber: "", cMessage: "" });
       loadInquiries();
-    } catch (err: unknown) {
-      toast.error(getErrorMessage(err, "Failed to register inquiry."));
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      toast.error(err?.response?.data?.message || "Failed to register inquiry.");
     } finally {
       setSubmittingInquiry(false);
     }
@@ -146,8 +142,7 @@ export default function InquiriesPage() {
               Public & Student Inquiries
             </h1>
             <p className="text-xs sm:text-sm text-zinc-400 mt-1">
-              Review live candidate inquiries, scholarship requests, and campus visit queries
-              directly from the backend.
+              Review live candidate inquiries, scholarship requests, and campus visit queries directly from the backend.
             </p>
           </div>
 
@@ -174,25 +169,17 @@ export default function InquiriesPage() {
         {/* Quick Stats Bar */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
           <div className="p-4 rounded-2xl bg-zinc-950/80 border border-zinc-800">
-            <p className="text-[11px] uppercase tracking-wider text-zinc-500 font-semibold">
-              Total Inquiries
-            </p>
-            <p className="text-xl sm:text-2xl font-bold text-white font-mono mt-1">
-              {inquiries.length}
-            </p>
+            <p className="text-[11px] uppercase tracking-wider text-zinc-500 font-semibold">Total Inquiries</p>
+            <p className="text-xl sm:text-2xl font-bold text-white font-mono mt-1">{inquiries.length}</p>
           </div>
           <div className="p-4 rounded-2xl bg-zinc-950/80 border border-zinc-800">
-            <p className="text-[11px] uppercase tracking-wider text-zinc-500 font-semibold">
-              Backend Endpoint
-            </p>
+            <p className="text-[11px] uppercase tracking-wider text-zinc-500 font-semibold">Backend Endpoint</p>
             <p className="text-xs sm:text-sm font-semibold text-emerald-400 font-mono mt-1 truncate">
               /api/v1/contact/admin/getContact
             </p>
           </div>
           <div className="p-4 rounded-2xl bg-zinc-950/80 border border-zinc-800 col-span-2 sm:col-span-1">
-            <p className="text-[11px] uppercase tracking-wider text-zinc-500 font-semibold">
-              Desk Status
-            </p>
+            <p className="text-[11px] uppercase tracking-wider text-zinc-500 font-semibold">Desk Status</p>
             <p className="text-xs sm:text-sm font-semibold text-indigo-300 flex items-center gap-1.5 mt-1">
               <CheckCircle2 size={14} className="text-emerald-400" /> Dispatch System Active
             </p>
@@ -202,10 +189,7 @@ export default function InquiriesPage() {
         {/* Filter and Search Bar */}
         <div className="bg-zinc-950/70 p-3 sm:p-4 rounded-2xl border border-zinc-800 flex items-center gap-3">
           <div className="relative flex-1">
-            <Search
-              size={16}
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500"
-            />
+            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" />
             <input
               type="text"
               placeholder="Search inquiries by candidate name, email, phone, or question..."
@@ -231,13 +215,11 @@ export default function InquiriesPage() {
             const email = inq.cEmail || inq.email || "No email provided";
             const phone = inq.cNumber ? String(inq.cNumber) : inq.phone || "No phone provided";
             const message = inq.cMessage || inq.message || "General campus information query";
-            const dateStr = inq.createdAt
-              ? new Date(inq.createdAt).toLocaleDateString(undefined, {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                })
-              : "Recent";
+            const dateStr = inq.createdAt ? new Date(inq.createdAt).toLocaleDateString(undefined, {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+            }) : "Recent";
 
             return (
               <div
@@ -251,9 +233,7 @@ export default function InquiriesPage() {
                         {name.charAt(0).toUpperCase()}
                       </div>
                       <div>
-                        <h3 className="font-bold text-sm sm:text-base text-white leading-snug">
-                          {name}
-                        </h3>
+                        <h3 className="font-bold text-sm sm:text-base text-white leading-snug">{name}</h3>
                         <p className="text-[11px] font-mono text-zinc-400 flex items-center gap-1.5 mt-0.5">
                           <Mail size={12} className="text-zinc-500 shrink-0" />
                           <span className="truncate">{email}</span>
@@ -288,9 +268,7 @@ export default function InquiriesPage() {
                   <button
                     onClick={() => {
                       setSelectedInquiry(inq);
-                      setReplyText(
-                        `Dear ${name},\n\nThank you for contacting Central Institute of Information Technology & Management (CIITM).\n\nIn response to your query regarding: "${message.slice(0, 80)}..."\n\nSincerely,\nAdmissions & Outreach Office\nCIITM Dhanbad`,
-                      );
+                      setReplyText(`Dear ${name},\n\nThank you for contacting Central Institute of Information Technology & Management (CIITM).\n\nIn response to your query regarding: "${message.slice(0, 80)}..."\n\nSincerely,\nAdmissions & Outreach Office\nCIITM Dhanbad`);
                     }}
                     className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white shadow-sm transition active:scale-95"
                   >
@@ -313,13 +291,10 @@ export default function InquiriesPage() {
           <div className="text-center py-16 text-zinc-500 rounded-2xl border border-zinc-900 bg-zinc-950/40 space-y-2">
             <MessageSquareText size={32} className="mx-auto text-zinc-600 mb-2" />
             <p className="text-sm font-medium text-zinc-400">
-              {loading
-                ? "Fetching inquiries from database..."
-                : "No contact inquiries found matching criteria."}
+              {loading ? "Fetching inquiries from database..." : "No contact inquiries found matching criteria."}
             </p>
             <p className="text-xs text-zinc-600">
-              Submit a public inquiry using the 'Log Inquiry' button to record prospective candidate
-              inquiries.
+              Submit a public inquiry using the 'Log Inquiry' button to record prospective candidate inquiries.
             </p>
           </div>
         )}
@@ -337,9 +312,7 @@ export default function InquiriesPage() {
                 <h2 className="text-base sm:text-lg font-bold text-white mt-1">
                   Reply to {selectedInquiry.cName || selectedInquiry.name || "Candidate"}
                 </h2>
-                <p className="text-xs text-zinc-400 font-mono truncate">
-                  {selectedInquiry.cEmail || selectedInquiry.email}
-                </p>
+                <p className="text-xs text-zinc-400 font-mono truncate">{selectedInquiry.cEmail || selectedInquiry.email}</p>
               </div>
               <button
                 onClick={() => setSelectedInquiry(null)}
@@ -351,9 +324,7 @@ export default function InquiriesPage() {
 
             <div className="text-xs bg-zinc-950 p-3 rounded-xl border border-zinc-800 text-zinc-300">
               <span className="text-zinc-500 font-semibold block mb-1">Inquiry Query:</span>
-              <p className="italic font-sans text-zinc-400">
-                "{selectedInquiry.cMessage || selectedInquiry.message}"
-              </p>
+              <p className="italic font-sans text-zinc-400">"{selectedInquiry.cMessage || selectedInquiry.message}"</p>
             </div>
 
             <form onSubmit={handleSendReply} className="space-y-4">
@@ -398,9 +369,7 @@ export default function InquiriesPage() {
                 <span className="text-xs uppercase tracking-wider font-semibold text-indigo-400">
                   Admission Desk Log
                 </span>
-                <h2 className="text-base sm:text-lg font-bold text-white mt-1">
-                  Register Public Inquiry
-                </h2>
+                <h2 className="text-base sm:text-lg font-bold text-white mt-1">Register Public Inquiry</h2>
               </div>
               <button
                 onClick={() => setIsNewInquiryModalOpen(false)}
@@ -441,9 +410,7 @@ export default function InquiriesPage() {
                   type="tel"
                   placeholder="e.g. 9876543210"
                   value={newInquiryForm.cNumber}
-                  onChange={(e) =>
-                    setNewInquiryForm({ ...newInquiryForm, cNumber: e.target.value })
-                  }
+                  onChange={(e) => setNewInquiryForm({ ...newInquiryForm, cNumber: e.target.value })}
                   className="w-full mt-1 px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-xs sm:text-sm text-white font-mono focus:outline-none focus:border-indigo-500"
                 />
               </div>
@@ -455,9 +422,7 @@ export default function InquiriesPage() {
                   rows={3}
                   placeholder="Details regarding course syllabus, fee schedule, hostel..."
                   value={newInquiryForm.cMessage}
-                  onChange={(e) =>
-                    setNewInquiryForm({ ...newInquiryForm, cMessage: e.target.value })
-                  }
+                  onChange={(e) => setNewInquiryForm({ ...newInquiryForm, cMessage: e.target.value })}
                   className="w-full mt-1 px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-indigo-500"
                 />
               </div>

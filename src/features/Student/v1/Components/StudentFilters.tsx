@@ -1,8 +1,9 @@
-import { useState } from "react";
-import { Filter, Search } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Filter, Search, RotateCcw } from "lucide-react";
 import useStudentStore from "../../../Course/v1/store/student.store";
 import api from "../../../../Utils/api.utils";
-import { Button } from "../../../../Components";
+import { toast } from "react-toastify";
+import { BackendStudent } from "../../../../types/backend.types";
 
 interface StudentFiltersProps {
   semesters: number[];
@@ -13,18 +14,29 @@ export function StudentFilters({ semesters, courses }: StudentFiltersProps) {
   const setStudents = useStudentStore((state) => state.setStudents);
 
   const [semester, setSemester] = useState<number>(semesters[0] ?? 1);
-  const [course, setCourse] = useState(courses[0] || "Bachelor of Computer Applications (BCA)");
-  const [uniqueIdQuery, setUniqueIdQuery] = useState("");
+  const [course, setCourse] = useState(courses[0] || "");
+  const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    if (!course && courses.length > 0) {
+      setCourse(courses[0]);
+    }
+  }, [courses, course]);
+
   const searchStudents = async () => {
+    const targetCourse = course || courses[0];
+    if (!targetCourse) {
+      toast.warn("Please select an academic course to search.");
+      return;
+    }
+
     try {
       setLoading(true);
-      const selectedCourse = course || courses[0] || "Bachelor of Computer Applications (BCA)";
 
       const res = await api.get("/api/v1/Student/FindByCourseAndSemester", {
         params: {
-          course: selectedCourse,
+          course: targetCourse,
           semester,
           PerPage: 1,
           Limit: 50,
@@ -32,112 +44,106 @@ export function StudentFilters({ semesters, courses }: StudentFiltersProps) {
       });
 
       if (res.data?.data && Array.isArray(res.data.data)) {
-        setStudents(res.data.data);
+        let list = res.data.data;
+        if (searchQuery.trim()) {
+          const q = searchQuery.toLowerCase().trim();
+          list = list.filter((s: BackendStudent) => {
+            const fullName = `${s.student?.firstName || ""} ${s.student?.lastName || ""}`.toLowerCase();
+            const uid = (s.uniqueId || "").toLowerCase();
+            const email = (s.student?.email?.[0] || "").toLowerCase();
+            return fullName.includes(q) || uid.includes(q) || email.includes(q);
+          });
+        }
+        setStudents(list);
+        if (list.length > 0) {
+          toast.success(`Found ${list.length} student record(s) for ${targetCourse} (Sem ${semester}).`);
+        } else {
+          toast.info(`No students enrolled in ${targetCourse} for Semester ${semester}.`);
+        }
       }
-    } catch (error) {
-      console.warn("Error fetching students by course/semester:", error);
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      toast.error(err?.response?.data?.message || "Failed to search students.");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSearchUniqueId = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!uniqueIdQuery.trim()) return;
-
-    try {
-      setLoading(true);
-      const res = await api.get(
-        `/api/v1/Student/FindByUniqueId?uniqueId=${encodeURIComponent(uniqueIdQuery.trim())}`,
-      );
-
-      if (res.data?.data) {
-        setStudents([res.data.data]);
-      }
-    } catch (error) {
-      console.warn("Student lookup by uniqueId error:", error);
-    } finally {
-      setLoading(false);
-    }
+  const handleReset = () => {
+    setCourse(courses[0] || "");
+    setSemester(1);
+    setSearchQuery("");
   };
 
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-950/80 p-5 space-y-4">
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-        {/* Direct Unique ID Search */}
-        <form onSubmit={handleSearchUniqueId} className="flex-1 max-w-md flex items-center gap-2">
-          <div className="relative flex-1">
-            <Search
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500"
-              size={16}
-            />
+    <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4 sm:p-5 shadow-xl">
+      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 items-end">
+        {/* Course */}
+        <div className="lg:col-span-4">
+          <label className="mb-1.5 block text-xs font-semibold text-zinc-400">Academic Course</label>
+          <select
+            value={course}
+            onChange={(e) => setCourse(e.target.value)}
+            className="h-11 w-full rounded-xl border border-zinc-800 bg-zinc-900/90 px-3.5 text-xs sm:text-sm text-white focus:outline-none focus:border-indigo-500"
+          >
+            {courses.map((item) => (
+              <option key={item} value={item}>
+                {item}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Semester */}
+        <div className="lg:col-span-2">
+          <label className="mb-1.5 block text-xs font-semibold text-zinc-400">Semester</label>
+          <select
+            value={semester}
+            onChange={(e) => setSemester(Number(e.target.value))}
+            className="h-11 w-full rounded-xl border border-zinc-800 bg-zinc-900/90 px-3.5 text-xs sm:text-sm text-white focus:outline-none focus:border-indigo-500"
+          >
+            {semesters.map((item) => (
+              <option key={item} value={item}>
+                Semester {item}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Keyword Filter */}
+        <div className="lg:col-span-3">
+          <label className="mb-1.5 block text-xs font-semibold text-zinc-400">Search Name / ID</label>
+          <div className="relative">
+            <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" />
             <input
               type="text"
-              placeholder="Instant Search by Unique ID (e.g. CIITM_906953)..."
-              value={uniqueIdQuery}
-              onChange={(e) => setUniqueIdQuery(e.target.value)}
-              className="w-full h-11 pl-10 pr-3.5 rounded-xl border border-zinc-800 bg-zinc-900/80 text-xs sm:text-sm text-zinc-200 placeholder:text-zinc-500 focus:outline-none focus:border-indigo-500 transition"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="e.g. Sanjeev or CIITM_906953"
+              className="h-11 w-full pl-9 pr-3 rounded-xl border border-zinc-800 bg-zinc-900/90 text-xs sm:text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500 font-mono"
             />
           </div>
-          <Button
-            type="submit"
-            variant="secondary"
-            size="md"
-            disabled={loading || !uniqueIdQuery.trim()}
-          >
-            Lookup
-          </Button>
-        </form>
+        </div>
 
-        <span className="hidden lg:block text-xs uppercase tracking-wider text-zinc-600">
-          — OR FILTER BATCH —
-        </span>
-
-        {/* Filter controls */}
-        <div className="flex flex-wrap items-center gap-3">
-          {/* Course select */}
-          <div className="min-w-[200px]">
-            <select
-              value={course}
-              onChange={(e) => setCourse(e.target.value)}
-              className="h-11 w-full rounded-xl border border-zinc-800 bg-zinc-900/80 px-3.5 text-xs text-zinc-200 focus:border-indigo-500 outline-none transition"
-            >
-              {courses.map((item) => (
-                <option key={item} value={item}>
-                  {item}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Semester select */}
-          <div>
-            <select
-              value={semester}
-              onChange={(e) => setSemester(Number(e.target.value))}
-              className="h-11 rounded-xl border border-zinc-800 bg-zinc-900/80 px-3.5 text-xs text-zinc-200 focus:border-indigo-500 outline-none transition"
-            >
-              {semesters.map((item) => (
-                <option key={item} value={item}>
-                  Semester {item}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <Button
-            type="button"
-            variant="primary"
-            size="md"
+        {/* Actions */}
+        <div className="lg:col-span-3 flex items-center gap-2">
+          <button
             onClick={searchStudents}
             disabled={loading}
-            icon={<Filter size={15} />}
+            className="flex-1 flex h-11 items-center justify-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 font-semibold text-xs sm:text-sm text-white shadow-lg shadow-indigo-600/20 transition active:scale-95 disabled:opacity-50"
           >
-            {loading ? "Filtering..." : "Filter Batch"}
-          </Button>
+            <Filter size={15} />
+            <span>{loading ? "Searching..." : "Apply Filters"}</span>
+          </button>
+          <button
+            onClick={handleReset}
+            title="Reset Filters"
+            className="h-11 px-3 rounded-xl border border-zinc-800 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white transition"
+          >
+            <RotateCcw size={15} />
+          </button>
         </div>
       </div>
     </div>
   );
 }
-export default StudentFilters;

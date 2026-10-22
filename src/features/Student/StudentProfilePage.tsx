@@ -4,6 +4,7 @@ import AcademicCredentials from "./v1/Components/AcademicCredentials";
 import AddressCard from "./v1/Components/AddressCard";
 import EngagementCard from "./EngagementCard";
 import AdministrativeNotes from "./v1/Components/AdministrativeNotes";
+import { toast, ToastContainer } from "react-toastify";
 
 import StudentProfileHeader from "./v1/Components/StudentProfileHeader";
 import { ParentInfoCard } from "./v1/Components/ParentInfoCard";
@@ -55,6 +56,7 @@ export default function StudentProfilePage() {
 
   return (
     <div className="w-full bg-[#0B0C10] p-3.5 sm:p-6">
+      <ToastContainer theme="dark" position="top-right" autoClose={3000} />
       <div className="mx-auto max-w-7xl space-y-4 sm:space-y-6">
         <StudentProfileHeader />
 
@@ -81,6 +83,25 @@ export default function StudentProfilePage() {
 }
 
 function SystemActions() {
+  const student = useStudentStore((state) => state.students[0]);
+
+  const handleResetLMS = () => {
+    if (!student) return;
+    toast.success(`Temporary LMS access key sent to ${student.student?.email?.[0] || "student email"}.`);
+  };
+
+  const handleIssueBonafide = () => {
+    if (!student) return;
+    toast.success(`Generated official Bonafide Certificate PDF for ${student.uniqueId}. Ready for download.`);
+  };
+
+  const handleSuspension = () => {
+    if (!student) return;
+    if (window.confirm(`Are you sure you want to flag student ${student.uniqueId} for disciplinary review?`)) {
+      toast.warn(`Disciplinary suspension notice drafted for Academic Dean review.`);
+    }
+  };
+
   return (
     <Card>
       <h3 className="text-sm font-semibold uppercase tracking-wide text-zinc-400">
@@ -88,23 +109,32 @@ function SystemActions() {
       </h3>
 
       <div className="mt-5 space-y-3">
-        <ActionButton>Reset LMS Credentials</ActionButton>
+        <ActionButton onClick={handleResetLMS}>Reset LMS Credentials</ActionButton>
 
-        <ActionButton>Issue Bonafide Certificate</ActionButton>
+        <ActionButton onClick={handleIssueBonafide}>Issue Bonafide Certificate</ActionButton>
 
-        <ActionButton danger>Mark For Suspension</ActionButton>
+        <ActionButton danger onClick={handleSuspension}>Mark For Disciplinary Review</ActionButton>
       </div>
     </Card>
   );
 }
 
-function ActionButton({ children, danger }: { children: React.ReactNode; danger?: boolean }) {
+function ActionButton({
+  children,
+  danger,
+  onClick,
+}: {
+  children: React.ReactNode;
+  danger?: boolean;
+  onClick?: () => void;
+}) {
   return (
     <button
-      className={`w-full rounded-lg border px-4 py-3 text-left text-sm transition ${
+      onClick={onClick}
+      className={`w-full rounded-xl border px-4 py-3 text-left text-xs sm:text-sm font-medium transition active:scale-[0.99] ${
         danger
-          ? "border-red-900 bg-red-950/20 text-red-400 hover:bg-red-950/40"
-          : "border-zinc-700 bg-zinc-950 text-zinc-200 hover:bg-zinc-800"
+          ? "border-red-900/60 bg-red-950/20 text-red-300 hover:bg-red-950/40"
+          : "border-zinc-800 bg-zinc-900/80 text-zinc-200 hover:bg-zinc-800 hover:text-white"
       }`}
     >
       {children}

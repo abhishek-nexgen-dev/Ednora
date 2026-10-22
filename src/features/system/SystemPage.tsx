@@ -13,17 +13,16 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
-import api, { getErrorMessage } from "../../Utils/api.utils";
+import api from "../../Utils/api.utils";
 import { BackendQueueMetrics } from "../../types/backend.types";
+import { GreetForm } from "../greet";
 
-interface HealthStatus {
-  status?: string;
+interface BackendHealthStatus {
   uptime?: number;
-  timestamp?: string;
-  service?: string;
-  services?: { database?: string };
-  database?: string;
-  version?: string;
+  services?: {
+    database?: string;
+    broker?: string;
+  };
   queues?: BackendQueueMetrics;
 }
 
@@ -34,13 +33,7 @@ export default function SystemPage() {
     messagesPublished: 0,
     messagesProcessed: 0,
     messagesFailed: 0,
-    activeQueues: [
-      "admissions_queue",
-      "notifications_queue",
-      "email_queue",
-      "payments_queue",
-      "audit_queue",
-    ],
+    activeQueues: ["admissions_queue", "notifications_queue", "email_queue", "payments_queue", "audit_queue"],
     inMemoryQueueDepths: {
       admissions_queue: 0,
       notifications_queue: 0,
@@ -49,19 +42,13 @@ export default function SystemPage() {
       audit_queue: 0,
     },
   });
-  const [healthStatus, setHealthStatus] = useState<HealthStatus | null>(null);
+  const [healthStatus, setHealthStatus] = useState<BackendHealthStatus | null>(null);
   const [loading, setLoading] = useState(false);
   const [activeQueue, setActiveQueue] = useState("notifications_queue");
   const [payloadText, setPayloadText] = useState(
-    JSON.stringify(
-      { title: "Annual Sports Meet 2026", target: "all-students", priority: "normal" },
-      null,
-      2,
-    ),
+    JSON.stringify({ title: "Annual Sports Meet 2026", target: "all-students", priority: "normal" }, null, 2),
   );
-  const [logs, setLogs] = useState<
-    Array<{ id: string; time: string; queue: string; status: string; msg: string }>
-  >([
+  const [logs, setLogs] = useState<Array<{ id: string; time: string; queue: string; status: string; msg: string }>>([
     {
       id: "log-1",
       time: new Date().toLocaleTimeString(),
@@ -126,8 +113,9 @@ export default function SystemPage() {
         ...prev,
       ]);
       fetchDiagnostics();
-    } catch (err: unknown) {
-      toast.error(getErrorMessage(err, "Failed to publish message."));
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      toast.error(err?.response?.data?.message || "Failed to publish message.");
     }
   };
 
@@ -184,8 +172,7 @@ export default function SystemPage() {
               RabbitMQ Queue Engine & Server Health
             </h1>
             <p className="text-xs sm:text-sm text-zinc-400 mt-1">
-              Live monitoring of message brokers, microservice queues, and backend endpoints on
-              Render.
+              Live monitoring of message brokers, microservice queues, and backend endpoints on Render.
             </p>
           </div>
 
@@ -202,9 +189,7 @@ export default function SystemPage() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4 sm:p-5 shadow-sm">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] sm:text-xs font-semibold text-zinc-400 uppercase">
-                Core Runtime
-              </span>
+              <span className="text-[11px] sm:text-xs font-semibold text-zinc-400 uppercase">Core Runtime</span>
               <Server size={17} className="text-indigo-400" />
             </div>
             <p className="text-lg sm:text-xl font-bold text-white mt-2">Node.js 22 (ESM)</p>
@@ -215,9 +200,7 @@ export default function SystemPage() {
 
           <div className="rounded-2xl border border-emerald-500/30 bg-emerald-950/20 p-4 sm:p-5 shadow-sm">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] sm:text-xs font-semibold text-emerald-300 uppercase">
-                Database Guard
-              </span>
+              <span className="text-[11px] sm:text-xs font-semibold text-emerald-300 uppercase">Database Guard</span>
               <Database size={17} className="text-emerald-400" />
             </div>
             <div className="flex items-center gap-2 mt-2">
@@ -234,14 +217,10 @@ export default function SystemPage() {
 
           <div className="rounded-2xl border border-amber-500/30 bg-amber-950/20 p-4 sm:p-5 shadow-sm">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] sm:text-xs font-semibold text-amber-300 uppercase">
-                AMQP Message Broker
-              </span>
+              <span className="text-[11px] sm:text-xs font-semibold text-amber-300 uppercase">AMQP Message Broker</span>
               <Radio size={17} className="text-amber-400" />
             </div>
-            <p className="text-lg sm:text-xl font-bold text-amber-200 truncate">
-              {queueMetrics.mode || "in-memory"}
-            </p>
+            <p className="text-lg sm:text-xl font-bold text-amber-200 truncate">{queueMetrics.mode || "in-memory"}</p>
             <p className="text-xs text-amber-400/80 mt-1">
               {queueMetrics.messagesPublished || 0} Pub • {queueMetrics.messagesProcessed || 0} Ack
             </p>
@@ -249,9 +228,7 @@ export default function SystemPage() {
 
           <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4 sm:p-5 shadow-sm">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] sm:text-xs font-semibold text-zinc-400 uppercase">
-                WebSocket Stream
-              </span>
+              <span className="text-[11px] sm:text-xs font-semibold text-zinc-400 uppercase">WebSocket Stream</span>
               <Cpu size={17} className="text-purple-400" />
             </div>
             <p className="text-lg sm:text-xl font-bold text-white">Socket.io 4.8</p>
@@ -259,15 +236,16 @@ export default function SystemPage() {
           </div>
         </div>
 
+        {/* Tauri v2 Native Bridge Diagnostics */}
+        <GreetForm />
+
         {/* 5 RabbitMQ Queues */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <h2 className="text-sm sm:text-base font-bold text-white flex items-center gap-2">
               <Layers size={18} className="text-indigo-400" /> Active AMQP Durable Queues
             </h2>
-            <span className="text-xs text-zinc-500 hidden sm:inline">
-              Auto-reconnect with FIFO resilience
-            </span>
+            <span className="text-xs text-zinc-500 hidden sm:inline">Auto-reconnect with FIFO resilience</span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
@@ -368,9 +346,7 @@ export default function SystemPage() {
                     <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 shrink-0">
                       {log.queue}
                     </span>
-                    <p className="text-zinc-300 text-[11px] leading-relaxed break-words">
-                      {log.msg}
-                    </p>
+                    <p className="text-zinc-300 text-[11px] leading-relaxed break-words">{log.msg}</p>
                   </div>
                 ))}
               </div>

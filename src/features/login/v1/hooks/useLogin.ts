@@ -2,27 +2,8 @@ import { useMutation } from "@tanstack/react-query";
 import api from "../../../../Utils/api.utils";
 import useAuthStorage from "./useAuthStorage";
 
-interface UserRecord {
-  _id?: string;
-  name?: string;
-  email?: string;
-  role?: string;
-}
-
-export interface LoginResult {
-  token?: string;
-  user?: UserRecord;
-  data?: {
-    user?: UserRecord;
-    _id?: string;
-    name?: string;
-    email?: string;
-    role?: string;
-  };
-}
-
 export default function useLogin() {
-  return useMutation<LoginResult, unknown, { email: string; password: string }>({
+  return useMutation({
     mutationFn: async ({ email, password }: { email: string; password: string }) => {
       try {
         const response = await api.post(`/api/v1/auth/login`, { email, password });
@@ -44,8 +25,12 @@ export default function useLogin() {
       }
     },
 
-    onSuccess: (res: LoginResult) => {
-      const user = res?.data?.user || res?.user || res?.data;
+    onSuccess: (res: {
+      data?: { user?: { _id?: string; name?: string; email?: string; role?: string } };
+      user?: { _id?: string; name?: string; email?: string; role?: string };
+      token?: string;
+    }) => {
+      const user = res?.data?.user || res?.user;
       if (user) {
         useAuthStorage.getState().setUser({
           _id: user._id || "admin_1",
@@ -57,6 +42,10 @@ export default function useLogin() {
           useAuthStorage.getState().setToken(res.token);
         }
       }
+    },
+
+    onError: (error) => {
+      console.warn("Login endpoint error:", error);
     },
   });
 }
