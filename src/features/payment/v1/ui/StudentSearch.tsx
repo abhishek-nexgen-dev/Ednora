@@ -9,26 +9,31 @@ function StudentSearch() {
   const [studentId, setStudentId] = useState("CIITM_906953");
   const [searching, setSearching] = useState(false);
 
-  const handleSubmit = useCallback(async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!studentId.trim()) return;
+  const handleSubmit = useCallback(
+    async (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      if (!studentId.trim()) return;
 
-    setSearching(true);
-    try {
-      const response = await api.get(`/api/v1/Student/FindByUniqueId?uniqueId=${encodeURIComponent(studentId.trim())}`);
-      const { data } = response.data;
-      if (data) {
-        useStudentStore.getState().setStudents([data]);
-        toast.success(`Loaded financial profile for ${data.uniqueId}`);
-      } else {
-        toast.info("No student record found with that Unique ID.");
+      setSearching(true);
+      try {
+        const response = await api.get(
+          `/api/v1/Student/FindByUniqueId?uniqueId=${encodeURIComponent(studentId.trim())}`,
+        );
+        const { data } = response.data;
+        if (data) {
+          useStudentStore.getState().setStudents([data]);
+          toast.success(`Loaded financial profile for ${data.uniqueId}`);
+        } else {
+          toast.info("No student record found with that Unique ID.");
+        }
+      } catch {
+        toast.error("Lookup failed. Please verify student ID.");
+      } finally {
+        setSearching(false);
       }
-    } catch {
-      toast.error("Lookup failed. Please verify student ID.");
-    } finally {
-      setSearching(false);
-    }
-  }, [studentId]);
+    },
+    [studentId],
+  );
 
   return (
     <form

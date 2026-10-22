@@ -5,20 +5,14 @@ import { Building2, ShieldCheck, Activity, Users, Lock, CheckCircle2 } from "luc
 const LoginPage = () => {
   return (
     <main className="min-h-screen bg-[#06070B] text-white flex flex-col justify-center py-6 sm:py-10 lg:py-16 px-3.5 sm:px-6 lg:px-8">
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        theme="dark"
-      />
+      <ToastContainer position="top-right" autoClose={3000} theme="dark" />
 
       {/* Top Banner on Mobile/Tablet */}
       <div className="lg:hidden max-w-md mx-auto w-full mb-6 text-center space-y-2">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">
           <ShieldCheck size={13} /> Official CIITM ERP Gateway
         </div>
-        <p className="text-xs text-zinc-400">
-          Central Institute of Technology & Management
-        </p>
+        <p className="text-xs text-zinc-400">Central Institute of Technology & Management</p>
       </div>
 
       <div className="w-full max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
@@ -44,7 +38,8 @@ const LoginPage = () => {
             </div>
 
             <p className="mt-4 text-sm text-zinc-400 leading-relaxed max-w-md">
-              Secure administrative terminal for faculty governance, curriculum accreditation, admissions review, and fee management.
+              Secure administrative terminal for faculty governance, curriculum accreditation,
+              admissions review, and fee management.
             </p>
           </div>
 
@@ -56,7 +51,9 @@ const LoginPage = () => {
               </div>
               <div>
                 <h4 className="text-xs font-bold text-white">Role-Based Council Access</h4>
-                <p className="text-[11px] text-zinc-400 mt-0.5">Strict authorization for Super Admins, Deans, Bursars, and Registrars.</p>
+                <p className="text-[11px] text-zinc-400 mt-0.5">
+                  Strict authorization for Super Admins, Deans, Bursars, and Registrars.
+                </p>
               </div>
             </div>
 
@@ -66,7 +63,9 @@ const LoginPage = () => {
               </div>
               <div>
                 <h4 className="text-xs font-bold text-white">RabbitMQ & Socket.io Live Broker</h4>
-                <p className="text-[11px] text-zinc-400 mt-0.5">Real-time asynchronous queues for admissions, circulars, and transactions.</p>
+                <p className="text-[11px] text-zinc-400 mt-0.5">
+                  Real-time asynchronous queues for admissions, circulars, and transactions.
+                </p>
               </div>
             </div>
 
@@ -76,7 +75,9 @@ const LoginPage = () => {
               </div>
               <div>
                 <h4 className="text-xs font-bold text-white">Unified Student Lifecycle</h4>
-                <p className="text-[11px] text-zinc-400 mt-0.5">From initial application submission to degree conferral and transcripts.</p>
+                <p className="text-[11px] text-zinc-400 mt-0.5">
+                  From initial application submission to degree conferral and transcripts.
+                </p>
               </div>
             </div>
           </div>

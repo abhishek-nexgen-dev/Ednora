@@ -55,7 +55,10 @@ export function StudentTable() {
             const initial = firstName.charAt(0).toUpperCase();
             const phone = student.student?.contactNumber || "N/A";
             const email = student.student?.email ? student.student.email[0] : "N/A";
-            const feePaid = student.fee?.amount_paid !== undefined ? `₹${student.fee.amount_paid.toLocaleString()}` : "₹0";
+            const feePaid =
+              student.fee?.amount_paid !== undefined
+                ? `₹${student.fee.amount_paid.toLocaleString()}`
+                : "₹0";
 
             return (
               <div key={student._id} className="p-4 space-y-3">
@@ -89,9 +92,16 @@ export function StudentTable() {
                 </div>
 
                 <div className="text-xs text-zinc-400 space-y-1 bg-zinc-900/60 p-2.5 rounded-xl border border-zinc-800/60">
-                  <p className="truncate"><span className="text-zinc-500">Email:</span> {email}</p>
-                  <p><span className="text-zinc-500">Phone:</span> {phone}</p>
-                  <p><span className="text-zinc-500">Course:</span> {student.course || "BCA Program"} (Sem {student.semester || 1})</p>
+                  <p className="truncate">
+                    <span className="text-zinc-500">Email:</span> {email}
+                  </p>
+                  <p>
+                    <span className="text-zinc-500">Phone:</span> {phone}
+                  </p>
+                  <p>
+                    <span className="text-zinc-500">Course:</span> {student.course || "BCA Program"}{" "}
+                    (Sem {student.semester || 1})
+                  </p>
                 </div>
 
                 <div className="flex justify-end pt-1">
@@ -114,46 +124,49 @@ export function StudentTable() {
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full min-w-[900px]">
           <thead className="bg-zinc-900/95 border-b border-zinc-800">
-              <tr>
-                <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase text-zinc-400">
-                  ID Number
-                </th>
-                <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase text-zinc-400">
-                  Student Name
-                </th>
-                <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase text-zinc-400">
-                  Date Of Birth
-                </th>
-                <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase text-zinc-400">
-                  Contact
-                </th>
-                <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase text-zinc-400">
-                  Fee Paid
-                </th>
-                <th className="px-5 py-3.5 text-right text-xs font-semibold uppercase text-zinc-400">
-                  Actions
-                </th>
-              </tr>
-            </thead>
+            <tr>
+              <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase text-zinc-400">
+                ID Number
+              </th>
+              <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase text-zinc-400">
+                Student Name
+              </th>
+              <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase text-zinc-400">
+                Date Of Birth
+              </th>
+              <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase text-zinc-400">
+                Contact
+              </th>
+              <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase text-zinc-400">
+                Fee Paid
+              </th>
+              <th className="px-5 py-3.5 text-right text-xs font-semibold uppercase text-zinc-400">
+                Actions
+              </th>
+            </tr>
+          </thead>
 
-            <tbody className="divide-y divide-zinc-900">
-              {students.length > 0 ? (
-                students.map((student) => <StudentRow key={student._id || student.uniqueId} student={student} />)
-              ) : (
-                <tr>
-                  <td colSpan={6} className="py-12 text-center text-zinc-500">
-                    No students found matching current criteria.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+          <tbody className="divide-y divide-zinc-900">
+            {students.length > 0 ? (
+              students.map((student) => (
+                <StudentRow key={student._id || student.uniqueId} student={student} />
+              ))
+            ) : (
+              <tr>
+                <td colSpan={6} className="py-12 text-center text-zinc-500">
+                  No students found matching current criteria.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
 
       {/* Footer */}
       <div className="flex items-center justify-between border-t border-zinc-800/80 p-4 text-xs text-zinc-400 bg-zinc-950/60">
         <p>
-          Showing <span className="font-semibold text-white">{students.length}</span> enrolled student
+          Showing <span className="font-semibold text-white">{students.length}</span> enrolled
+          student
           {students.length !== 1 ? "s" : ""}
         </p>
         <span className="text-[11px] text-zinc-500">CIITM Student Information System</span>

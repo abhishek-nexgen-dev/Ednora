@@ -120,7 +120,7 @@ export function ProgramConfiguration() {
               label="Total Seats"
               name={field.name}
               placeholder="120"
-              value={field.value ?? ""}
+              value={field.value !== undefined ? Number(field.value) : ""}
               readonly={false}
               error={errors.seats?.message}
               onChange={(_, value) => field.onChange(value)}

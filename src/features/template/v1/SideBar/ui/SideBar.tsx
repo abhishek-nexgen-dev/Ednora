@@ -106,7 +106,9 @@ export const Sidebar = () => {
                 <p className="text-xs font-semibold text-zinc-200 truncate">
                   {user?.name || "Prof. R. K. Sharma"}
                 </p>
-                <p className="text-[11px] text-zinc-500 truncate">{user?.email || "admin@gmail.com"}</p>
+                <p className="text-[11px] text-zinc-500 truncate">
+                  {user?.email || "admin@gmail.com"}
+                </p>
               </div>
             </div>
           ) : (

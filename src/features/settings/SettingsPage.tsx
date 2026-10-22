@@ -12,7 +12,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
-import api from "../../Utils/api.utils";
+import api, { getErrorMessage } from "../../Utils/api.utils";
 import { BackendSocialLinks, BackendFrontendSettings } from "../../types/backend.types";
 
 interface AdminUser {
@@ -37,7 +37,8 @@ export default function SettingsPage() {
     landingPage: {
       HeroSection: {
         homeTitle: "Shape Tomorrow with Quality Education",
-        homeParagraph: "Empowering students to achieve academic success and industry-standard technical skills.",
+        homeParagraph:
+          "Empowering students to achieve academic success and industry-standard technical skills.",
       },
     },
   });
@@ -58,15 +59,15 @@ export default function SettingsPage() {
     setLoading(true);
     try {
       const [sRes, fRes] = await Promise.allSettled([
-        api.get("/api/v1/social/link"),
+        api.get("/api/link"),
         api.get("/api/v1/frontend"),
       ]);
 
-      if (sRes.status === "fulfilled" && sRes.value.data?.link) {
-        setSocialLinks(sRes.value.data.link);
+      if (sRes.status === "fulfilled" && (sRes.value.data?.link || sRes.value.data?.data)) {
+        setSocialLinks(sRes.value.data?.link || sRes.value.data?.data);
       }
-      if (fRes.status === "fulfilled" && fRes.value.data?.data) {
-        setFrontendSettings(fRes.value.data.data);
+      if (fRes.status === "fulfilled" && (fRes.value.data?.data || fRes.value.data?.frontend)) {
+        setFrontendSettings(fRes.value.data?.data || fRes.value.data?.frontend);
       }
     } catch (err) {
       console.warn("Error fetching settings:", err);
@@ -83,10 +84,26 @@ export default function SettingsPage() {
     e.preventDefault();
     setIsSaving(true);
     try {
-      await api.put("/api/v1/social/link", socialLinks);
+      const phoneNum = Number(String(socialLinks.number).replace(/\D/g, "")) || 9661342993;
+      await api.put("/api/link", {
+        ...socialLinks,
+        Number: phoneNum,
+        number: phoneNum,
+      });
       toast.success("Institutional social media and contact channels updated!");
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to update social channels.");
+    } catch (err: unknown) {
+      try {
+        // Fallback to create if not existing
+        const phoneNum = Number(String(socialLinks.number).replace(/\D/g, "")) || 9661342993;
+        await api.post("/api/link", {
+          ...socialLinks,
+          Number: phoneNum,
+          number: phoneNum,
+        });
+        toast.success("Institutional social channels configured!");
+      } catch {
+        toast.error(getErrorMessage(err, "Failed to update social channels."));
+      }
     } finally {
       setIsSaving(false);
     }
@@ -98,8 +115,8 @@ export default function SettingsPage() {
     try {
       await api.put("/api/v1/frontend", frontendSettings);
       toast.success("Public landing page settings updated!");
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to update branding settings.");
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err, "Failed to update branding settings."));
     } finally {
       setIsSaving(false);
     }
@@ -123,8 +140,8 @@ export default function SettingsPage() {
         },
       ]);
       setNewAdminEmail("");
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to assign role.");
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err, "Failed to assign role."));
     }
   };
 
@@ -198,7 +215,9 @@ export default function SettingsPage() {
             className="rounded-2xl border border-zinc-800 bg-zinc-950 p-5 sm:p-8 shadow-xl space-y-5"
           >
             <div>
-              <h2 className="text-base font-bold text-white">Social Media & Campus Contact Links</h2>
+              <h2 className="text-base font-bold text-white">
+                Social Media & Campus Contact Links
+              </h2>
               <p className="text-xs text-zinc-500 mt-0.5">
                 Saved directly to the backend database at /api/v1/social/link.
               </p>
@@ -208,7 +227,10 @@ export default function SettingsPage() {
               <div>
                 <label className="text-xs font-medium text-zinc-400">Institutional Email</label>
                 <div className="relative mt-1">
-                  <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" />
+                  <Mail
+                    size={16}
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500"
+                  />
                   <input
                     type="email"
                     value={socialLinks.email || ""}
@@ -221,7 +243,10 @@ export default function SettingsPage() {
               <div>
                 <label className="text-xs font-medium text-zinc-400">Campus Contact Phone</label>
                 <div className="relative mt-1">
-                  <Phone size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" />
+                  <Phone
+                    size={16}
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500"
+                  />
                   <input
                     type="text"
                     value={String(socialLinks.number || "")}
@@ -281,7 +306,9 @@ export default function SettingsPage() {
             className="rounded-2xl border border-zinc-800 bg-zinc-950 p-5 sm:p-8 shadow-xl space-y-5"
           >
             <div>
-              <h2 className="text-base font-bold text-white">Public Website Dynamic Hero & Branding</h2>
+              <h2 className="text-base font-bold text-white">
+                Public Website Dynamic Hero & Branding
+              </h2>
               <p className="text-xs text-zinc-500 mt-0.5">
                 Controls the live landing page slogans, banner titles, and institutional branding.
               </p>
@@ -289,11 +316,15 @@ export default function SettingsPage() {
 
             <div className="space-y-4">
               <div>
-                <label className="text-xs font-medium text-zinc-400">Portal / Institution Brand Logo Text</label>
+                <label className="text-xs font-medium text-zinc-400">
+                  Portal / Institution Brand Logo Text
+                </label>
                 <input
                   type="text"
                   value={frontendSettings.logo || ""}
-                  onChange={(e) => setFrontendSettings({ ...frontendSettings, logo: e.target.value })}
+                  onChange={(e) =>
+                    setFrontendSettings({ ...frontendSettings, logo: e.target.value })
+                  }
                   className="w-full mt-1 px-3 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-indigo-500"
                 />
               </div>
@@ -320,7 +351,9 @@ export default function SettingsPage() {
               </div>
 
               <div>
-                <label className="text-xs font-medium text-zinc-400">Landing Page Mission Paragraph</label>
+                <label className="text-xs font-medium text-zinc-400">
+                  Landing Page Mission Paragraph
+                </label>
                 <textarea
                   rows={3}
                   value={frontendSettings.landingPage?.HeroSection?.homeParagraph || ""}

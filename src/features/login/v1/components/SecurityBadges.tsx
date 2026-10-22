@@ -7,12 +7,16 @@ export function SecurityBadges() {
         <ShieldCheck size={13} className="text-emerald-400" />
         <span>TLS 1.3 Strict</span>
       </div>
-      <span aria-hidden="true" className="text-zinc-700">·</span>
+      <span aria-hidden="true" className="text-zinc-700">
+        ·
+      </span>
       <div className="flex items-center gap-1.5">
         <Lock size={13} className="text-indigo-400" />
         <span>RBAC Clearance</span>
       </div>
-      <span aria-hidden="true" className="text-zinc-700">·</span>
+      <span aria-hidden="true" className="text-zinc-700">
+        ·
+      </span>
       <div className="flex items-center gap-1.5">
         <Activity size={13} className="text-amber-400" />
         <span>AMQP Broker</span>

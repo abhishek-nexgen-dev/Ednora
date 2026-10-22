@@ -1,11 +1,6 @@
-import { useSocketContext } from "../Provider/SocketProvider";
+import { useSocketContext } from "../Provider/SocketContext";
 
-export const useSocket = () => {
+export function useSocket() {
   const { socket } = useSocketContext();
-
-  if (!socket) {
-    throw new Error("useSocket must be used inside SocketProvider");
-  }
-
   return socket;
-};
+}

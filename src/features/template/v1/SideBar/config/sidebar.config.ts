@@ -8,6 +8,7 @@ import {
   Megaphone,
   MessageSquareText,
   Images,
+  Quote,
   Activity,
   Settings,
 } from "lucide-react";
@@ -77,6 +78,12 @@ export const sidebarConfig: SidebarItemConfig[] = [
     title: "Media Gallery",
     icon: Images,
     path: "/media",
+  },
+  {
+    id: "testimonials",
+    title: "Testimonials",
+    icon: Quote,
+    path: "/testimonials",
   },
   {
     id: "system",

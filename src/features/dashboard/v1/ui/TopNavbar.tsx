@@ -48,7 +48,9 @@ function TopNavbar() {
             {user?.name ? user.name.charAt(0).toUpperCase() : "A"}
           </div>
           <div className="hidden md:block text-left">
-            <p className="text-xs font-semibold text-white leading-tight">{user?.name || "Admin"}</p>
+            <p className="text-xs font-semibold text-white leading-tight">
+              {user?.name || "Admin"}
+            </p>
             <p className="text-[10px] text-zinc-500 leading-tight">Super Administrator</p>
           </div>
         </div>

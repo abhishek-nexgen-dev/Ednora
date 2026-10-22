@@ -13,7 +13,7 @@ import {
   EyeOff,
 } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
-import api from "../../Utils/api.utils";
+import api, { getErrorMessage } from "../../Utils/api.utils";
 
 export default function ForgotPasswordPage() {
   const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -34,18 +34,15 @@ export default function ForgotPasswordPage() {
 
     setLoading(true);
     try {
-      // Dispatch verification email request to backend
-      await api.post("/api/v1/online/admission/testing-email", {
-        recipientEmail: email.trim(),
-      }).catch((err) => {
-        console.warn("OTP dispatch notice:", err);
+      // Dispatch password reset OTP request to backend
+      const res = await api.post("/api/v1/forgot-password", {
+        email: email.trim(),
       });
 
-      toast.success(`Verification code dispatched to ${email}!`);
+      toast.success(res.data?.message || `Verification code dispatched to ${email}!`);
       setStep(2);
-    } catch {
-      toast.success(`Verification code dispatched to ${email}!`);
-      setStep(2);
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err, "Failed to send reset code. Please verify email."));
     } finally {
       setLoading(false);
     }
@@ -54,7 +51,7 @@ export default function ForgotPasswordPage() {
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!otp.trim()) {
-      toast.error("Please enter the 6-digit verification code.");
+      toast.error("Please enter the verification OTP code.");
       return;
     }
     if (newPassword.length < 6) {
@@ -68,10 +65,16 @@ export default function ForgotPasswordPage() {
 
     setLoading(true);
     try {
-      // Simulate password reset acknowledgment
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      toast.success("Administrator password updated successfully!");
+      // Validate OTP and reset password on backend
+      const res = await api.post("/api/v1/validate/password", {
+        email: email.trim(),
+        otp: otp.trim(),
+        newPassword: newPassword.trim(),
+      });
+      toast.success(res.data?.message || "Administrator password updated successfully!");
       setStep(3);
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err, "Invalid or expired OTP code."));
     } finally {
       setLoading(false);
     }
@@ -92,7 +95,9 @@ export default function ForgotPasswordPage() {
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 mb-2">
               <ShieldCheck size={13} /> Security Clearance Recovery
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">Reset Credentials</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+              Reset Credentials
+            </h1>
             <p className="text-xs sm:text-sm text-zinc-400 mt-1">
               CIITM Administrator Account Recovery
             </p>
@@ -100,23 +105,35 @@ export default function ForgotPasswordPage() {
 
           {/* Stepper Indicator */}
           <div className="flex items-center justify-center gap-2 pt-2">
-            <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold ${
-              step >= 1 ? "bg-indigo-600/30 text-indigo-300 border border-indigo-500/40" : "bg-zinc-900 text-zinc-600"
-            }`}>
+            <div
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold ${
+                step >= 1
+                  ? "bg-indigo-600/30 text-indigo-300 border border-indigo-500/40"
+                  : "bg-zinc-900 text-zinc-600"
+              }`}
+            >
               <span>1</span>
               <span className="hidden sm:inline">Identify</span>
             </div>
             <span className="text-zinc-700">→</span>
-            <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold ${
-              step >= 2 ? "bg-indigo-600/30 text-indigo-300 border border-indigo-500/40" : "bg-zinc-900 text-zinc-600"
-            }`}>
+            <div
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold ${
+                step >= 2
+                  ? "bg-indigo-600/30 text-indigo-300 border border-indigo-500/40"
+                  : "bg-zinc-900 text-zinc-600"
+              }`}
+            >
               <span>2</span>
               <span className="hidden sm:inline">Verify</span>
             </div>
             <span className="text-zinc-700">→</span>
-            <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold ${
-              step >= 3 ? "bg-emerald-600/30 text-emerald-300 border border-emerald-500/40" : "bg-zinc-900 text-zinc-600"
-            }`}>
+            <div
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold ${
+                step >= 3
+                  ? "bg-emerald-600/30 text-emerald-300 border border-emerald-500/40"
+                  : "bg-zinc-900 text-zinc-600"
+              }`}
+            >
               <span>3</span>
               <span className="hidden sm:inline">Done</span>
             </div>
@@ -131,15 +148,21 @@ export default function ForgotPasswordPage() {
             <div className="space-y-1">
               <h2 className="text-base font-bold text-white">Account Identification</h2>
               <p className="text-xs text-zinc-400">
-                Enter your institutional administrator email address to receive an authorization code.
+                Enter your institutional administrator email address to receive an authorization
+                code.
               </p>
             </div>
 
             <form onSubmit={handleSendOtp} className="space-y-4">
               <div>
-                <label className="text-xs uppercase tracking-wider font-semibold text-zinc-400">Registered Email Address</label>
+                <label className="text-xs uppercase tracking-wider font-semibold text-zinc-400">
+                  Registered Email Address
+                </label>
                 <div className="relative mt-2">
-                  <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" />
+                  <Mail
+                    size={16}
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500"
+                  />
                   <input
                     type="email"
                     required
@@ -154,7 +177,9 @@ export default function ForgotPasswordPage() {
               <div className="p-3 sm:p-3.5 rounded-2xl bg-gradient-to-r from-indigo-950/40 via-zinc-900/60 to-zinc-900/40 border border-indigo-500/30 text-xs text-indigo-300 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <AlertCircle size={15} className="shrink-0 text-indigo-400" />
-                  <span className="truncate">Default admin: <strong className="text-white font-mono">admin@gmail.com</strong></span>
+                  <span className="truncate">
+                    Default admin: <strong className="text-white font-mono">admin@gmail.com</strong>
+                  </span>
                 </div>
                 <button
                   type="button"
@@ -203,14 +228,17 @@ export default function ForgotPasswordPage() {
             <div className="space-y-1">
               <h2 className="text-base font-bold text-white">Enter Verification Code</h2>
               <p className="text-xs text-zinc-400">
-                A 6-digit OTP code has been dispatched to <strong className="text-zinc-200">{email}</strong>.
+                A 6-digit OTP code has been dispatched to{" "}
+                <strong className="text-zinc-200">{email}</strong>.
               </p>
             </div>
 
             <form onSubmit={handleResetPassword} className="space-y-4">
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs uppercase tracking-wider font-semibold text-zinc-400">6-Digit Authorization Code</label>
+                  <label className="text-xs uppercase tracking-wider font-semibold text-zinc-400">
+                    6-Digit Authorization Code
+                  </label>
                   <button
                     type="button"
                     onClick={() => setOtp("849201")}
@@ -220,7 +248,10 @@ export default function ForgotPasswordPage() {
                   </button>
                 </div>
                 <div className="relative">
-                  <KeyRound size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" />
+                  <KeyRound
+                    size={16}
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500"
+                  />
                   <input
                     type="text"
                     required
@@ -235,7 +266,9 @@ export default function ForgotPasswordPage() {
 
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs uppercase tracking-wider font-semibold text-zinc-400">New Password</label>
+                  <label className="text-xs uppercase tracking-wider font-semibold text-zinc-400">
+                    New Password
+                  </label>
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
@@ -246,7 +279,10 @@ export default function ForgotPasswordPage() {
                   </button>
                 </div>
                 <div className="relative">
-                  <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" />
+                  <Lock
+                    size={16}
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500"
+                  />
                   <input
                     type={showPassword ? "text" : "password"}
                     required
@@ -259,9 +295,14 @@ export default function ForgotPasswordPage() {
               </div>
 
               <div>
-                <label className="text-xs uppercase tracking-wider font-semibold text-zinc-400 mb-1.5 block">Confirm New Password</label>
+                <label className="text-xs uppercase tracking-wider font-semibold text-zinc-400 mb-1.5 block">
+                  Confirm New Password
+                </label>
                 <div className="relative">
-                  <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" />
+                  <Lock
+                    size={16}
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500"
+                  />
                   <input
                     type={showPassword ? "text" : "password"}
                     required
@@ -305,7 +346,8 @@ export default function ForgotPasswordPage() {
             <div>
               <h2 className="text-lg sm:text-xl font-bold text-white">Password Updated!</h2>
               <p className="text-xs text-zinc-400 mt-1.5 leading-relaxed">
-                Your administrator credentials have been successfully updated. You may now sign in with your new password.
+                Your administrator credentials have been successfully updated. You may now sign in
+                with your new password.
               </p>
             </div>
 

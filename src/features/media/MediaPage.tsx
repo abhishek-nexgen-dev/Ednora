@@ -15,7 +15,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
-import api from "../../Utils/api.utils";
+import api, { getErrorMessage } from "../../Utils/api.utils";
 import { BackendAlbum, BackendImage } from "../../types/backend.types";
 
 export default function MediaPage() {
@@ -163,9 +163,9 @@ export default function MediaPage() {
       setIsAlbumModalOpen(false);
       setAlbumForm({ albumName: "", description: "", coverImage: "", file: null });
       loadData();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Create album error:", err);
-      toast.error(err?.response?.data?.message || "Failed to create album on backend.");
+      toast.error(getErrorMessage(err, "Failed to create album on backend."));
     } finally {
       setIsSubmitting(false);
     }
@@ -197,7 +197,11 @@ export default function MediaPage() {
       }
 
       const formData = new FormData();
-      formData.append("image", imageBlob, `${(imageForm.title || "photo").replace(/\s+/g, "_")}.jpg`);
+      formData.append(
+        "image",
+        imageBlob,
+        `${(imageForm.title || "photo").replace(/\s+/g, "_")}.jpg`,
+      );
       formData.append("albumID", imageForm.albumId);
       formData.append("albumName", albumTitle);
       formData.append("aName", albumTitle);
@@ -211,9 +215,9 @@ export default function MediaPage() {
       setIsImageModalOpen(false);
       setImageForm({ title: "", albumId: "", imageUrl: "", file: null });
       loadData();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Upload image error:", err);
-      toast.error(err?.response?.data?.message || "Failed to upload photo to backend.");
+      toast.error(getErrorMessage(err, "Failed to upload photo to backend."));
     } finally {
       setIsSubmitting(false);
     }
@@ -233,8 +237,8 @@ export default function MediaPage() {
       setAlbums((prev) => prev.filter((a) => a._id !== id));
       setImages((prev) => prev.filter((img) => img.albumID !== id));
       loadData();
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to delete album.");
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err, "Failed to delete album."));
     }
   };
 
@@ -316,7 +320,8 @@ export default function MediaPage() {
               Photo Albums & Campus Gallery
             </h1>
             <p className="text-xs sm:text-sm text-zinc-400 mt-1">
-              Curate convocation archives, campus labs, workshops, and sports event galleries directly connected to backend storage.
+              Curate convocation archives, campus labs, workshops, and sports event galleries
+              directly connected to backend storage.
             </p>
           </div>
 
@@ -380,7 +385,9 @@ export default function MediaPage() {
                   {selectedAlbum.albumName || selectedAlbum.aName || "Campus Album"}
                 </h2>
                 <p className="text-xs text-zinc-400 line-clamp-1 mt-0.5">
-                  {selectedAlbum.description || selectedAlbum.aDescription || "Official CIITM Album Gallery"}
+                  {selectedAlbum.description ||
+                    selectedAlbum.aDescription ||
+                    "Official CIITM Album Gallery"}
                 </p>
               </div>
             </div>
@@ -472,7 +479,8 @@ export default function MediaPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
             {filteredAlbums.map((album) => {
               const name = album.albumName || album.aName || "Campus Album";
-              const desc = album.description || album.aDescription || "CIITM Campus Digital Archive";
+              const desc =
+                album.description || album.aDescription || "CIITM Campus Digital Archive";
               const count = getAlbumImageCount(album._id, album);
 
               // Find first image belonging to album if cover is empty
@@ -518,14 +526,14 @@ export default function MediaPage() {
 
                   {/* Album Body */}
                   <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
-                    <p className="text-xs text-zinc-400 line-clamp-2 leading-relaxed">
-                      {desc}
-                    </p>
+                    <p className="text-xs text-zinc-400 line-clamp-2 leading-relaxed">{desc}</p>
 
                     <div className="pt-3 border-t border-zinc-900 flex items-center justify-between text-xs text-zinc-500">
                       <span className="flex items-center gap-1 font-mono text-[11px]">
                         <Calendar size={12} />
-                        {album.createdAt ? new Date(album.createdAt).toLocaleDateString() : "Active"}
+                        {album.createdAt
+                          ? new Date(album.createdAt).toLocaleDateString()
+                          : "Active"}
                       </span>
 
                       <div className="flex items-center gap-1">
@@ -595,7 +603,9 @@ export default function MediaPage() {
                         </div>
 
                         <div>
-                          <p className="text-xs font-bold text-white truncate drop-shadow">{title}</p>
+                          <p className="text-xs font-bold text-white truncate drop-shadow">
+                            {title}
+                          </p>
                           <span className="text-[10px] text-indigo-300 font-semibold truncate block">
                             {albumName}
                           </span>
@@ -657,7 +667,9 @@ export default function MediaPage() {
             {/* Top Bar */}
             <div className="w-full flex items-center justify-between pb-3 text-white">
               <div>
-                <h3 className="font-bold text-sm sm:text-base">{previewImage.title || "Campus Photo"}</h3>
+                <h3 className="font-bold text-sm sm:text-base">
+                  {previewImage.title || "Campus Photo"}
+                </h3>
                 <p className="text-xs text-zinc-400 font-mono">
                   {albumMap.get(previewImage.albumID || "")?.albumName ||
                     albumMap.get(previewImage.albumID || "")?.aName ||
@@ -768,7 +780,9 @@ export default function MediaPage() {
               </div>
 
               <div>
-                <label className="text-xs font-medium text-zinc-400">Cover Photo File (Upload from device)</label>
+                <label className="text-xs font-medium text-zinc-400">
+                  Cover Photo File (Upload from device)
+                </label>
                 <input
                   type="file"
                   accept="image/*"
@@ -823,7 +837,9 @@ export default function MediaPage() {
                 <span className="text-xs uppercase tracking-wider font-semibold text-indigo-400">
                   Campus Gallery Upload
                 </span>
-                <h2 className="text-base sm:text-lg font-bold text-white mt-1">Upload Campus Photo</h2>
+                <h2 className="text-base sm:text-lg font-bold text-white mt-1">
+                  Upload Campus Photo
+                </h2>
               </div>
               <button
                 onClick={() => setIsImageModalOpen(false)}
@@ -868,7 +884,9 @@ export default function MediaPage() {
               </div>
 
               <div>
-                <label className="text-xs font-medium text-zinc-400">Select Image File (From device)</label>
+                <label className="text-xs font-medium text-zinc-400">
+                  Select Image File (From device)
+                </label>
                 <input
                   type="file"
                   accept="image/*"

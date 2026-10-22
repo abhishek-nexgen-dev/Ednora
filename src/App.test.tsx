@@ -17,7 +17,7 @@ describe("App", () => {
         </QueryClientProvider>
       </>,
     );
-    const headingElement = screen.getByText(/CIITM ERP/i);
-    expect(headingElement).toBeInTheDocument();
+    const headingElements = screen.getAllByText(/CIITM ERP/i);
+    expect(headingElements.length).toBeGreaterThan(0);
   });
 });

@@ -2,13 +2,32 @@ import { useMutation } from "@tanstack/react-query";
 import api from "../../../../Utils/api.utils";
 import useAuthStorage from "./useAuthStorage";
 
+interface UserRecord {
+  _id?: string;
+  name?: string;
+  email?: string;
+  role?: string;
+}
+
+export interface LoginResult {
+  token?: string;
+  user?: UserRecord;
+  data?: {
+    user?: UserRecord;
+    _id?: string;
+    name?: string;
+    email?: string;
+    role?: string;
+  };
+}
+
 export default function useLogin() {
-  return useMutation({
+  return useMutation<LoginResult, unknown, { email: string; password: string }>({
     mutationFn: async ({ email, password }: { email: string; password: string }) => {
       try {
         const response = await api.post(`/api/v1/auth/login`, { email, password });
         return response.data;
-      } catch (err: any) {
+      } catch (err: unknown) {
         // If credentials match default test credentials, allow login
         if (email === "admin@gmail.com" && password === "Admin@123") {
           return {
@@ -25,7 +44,7 @@ export default function useLogin() {
       }
     },
 
-    onSuccess: (res: any) => {
+    onSuccess: (res: LoginResult) => {
       const user = res?.data?.user || res?.user || res?.data;
       if (user) {
         useAuthStorage.getState().setUser({
@@ -38,10 +57,6 @@ export default function useLogin() {
           useAuthStorage.getState().setToken(res.token);
         }
       }
-    },
-
-    onError: (error) => {
-      console.warn("Login endpoint error:", error);
     },
   });
 }

@@ -7,7 +7,9 @@ export function StudentHeader() {
   return (
     <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
       <div>
-        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">Student Directory</h1>
+        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">
+          Student Directory
+        </h1>
         <p className="mt-1 text-sm text-zinc-400">
           Search academic transcripts, semester records, and enrollment dossiers.
         </p>

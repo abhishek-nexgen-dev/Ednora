@@ -36,7 +36,9 @@ export default function DashboardCard({ isActive, title, value, logo, range }: D
       </div>
 
       <div className="space-y-1.5 sm:space-y-2">
-        <p className="text-xs sm:text-sm text-zinc-400 font-medium truncate tracking-tight">{title}</p>
+        <p className="text-xs sm:text-sm text-zinc-400 font-medium truncate tracking-tight">
+          {title}
+        </p>
 
         <div className="flex items-baseline gap-2">
           <h2 className="text-xl sm:text-2xl xl:text-3xl font-bold text-white tracking-tight font-mono">

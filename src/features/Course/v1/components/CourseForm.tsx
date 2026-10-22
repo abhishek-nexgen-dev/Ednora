@@ -5,6 +5,7 @@ import { CourseBannerUpload } from "./CourseBannerUpload";
 import { ProtocolNotice } from "./ProtocolNotice";
 import { CoursePageHeader } from "./CoursePageHeader";
 import { toast, ToastContainer } from "react-toastify";
+import { getErrorMessage } from "../../../../Utils/api.utils";
 import useCourseFormContext from "../hooks/useCourseFormContext";
 import { CourseSchema } from "../Validations/CreateCourse.Validate";
 import { RequiredDocuments } from "./RequiredDocuments";
@@ -30,6 +31,7 @@ const CourseForm = () => {
       formData.append("Department", data.Department);
 
       if (data.courseImage) {
+        formData.append("courseThumbnail", data.courseImage);
         formData.append("image", data.courseImage);
       }
       if (data.AdmissionCriteria) {
@@ -46,8 +48,8 @@ const CourseForm = () => {
       await createCourse.mutateAsync(formData);
       toast.success(`Course "${data.courseName}" created successfully!`);
       setTimeout(() => navigate("/course-management"), 1200);
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to create course on server.");
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err, "Failed to create course on server."));
     }
   };
 

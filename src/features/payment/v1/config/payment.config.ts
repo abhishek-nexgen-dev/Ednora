@@ -130,6 +130,19 @@ export const PAYMENT_TIMELINE_ITEMS: PaymentTimelineItemConfig[] = [
   },
 ];
 
-export const PAYMENT_METHODS = ["UPI", "Card", "Bank Transfer"] as const;
+export const PAYMENT_METHODS = [
+  "UPI",
+  "Card Payment",
+  "Online Transfer",
+  "Cash",
+  "Cheque",
+] as const;
 
-export const FEE_TYPES = ["Semester Fee", "Hostel Fee", "Transport Fee"] as const;
+export const FEE_TYPES = [
+  "Semester Fee",
+  "Admission Fee",
+  "Exam Fee",
+  "Farewell Fee",
+  "Teacher Day Fee",
+  "Other",
+] as const;

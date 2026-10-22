@@ -1,6 +1,7 @@
 import { toast } from "react-toastify";
 import useLoginForm from "../hooks/useLoginForm";
-import useLogin from "../hooks/useLogin";
+import useLogin, { LoginResult } from "../hooks/useLogin";
+import { getErrorMessage } from "../../../../Utils/api.utils";
 import { Building2, Mail, Lock, Eye, EyeOff, ShieldCheck, KeyRound } from "lucide-react";
 import { SocialLogin } from "./SocialLogin";
 import { SecurityBadges } from "./SecurityBadges";
@@ -43,12 +44,12 @@ export function LoginCard() {
 
   const onSubmit = async (data: { email: string; password: string }) => {
     try {
-      const res = await loginMutation.mutateAsync({
+      const res: LoginResult = await loginMutation.mutateAsync({
         email: data.email,
         password: data.password,
       });
 
-      const user = (res as any)?.data?.user || (res as any)?.user || (res as any)?.data;
+      const user = res?.data?.user || res?.user || res?.data;
 
       if (user && user.role && user.role !== "admin") {
         toast.error("You are not authorized to access this portal.");
@@ -60,8 +61,8 @@ export function LoginCard() {
       setTimeout(() => {
         navigate("/dashboard");
       }, 700);
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Login failed. Please check your credentials.");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Login failed. Please check your credentials."));
     }
   };
 
@@ -85,7 +86,9 @@ export function LoginCard() {
                 SuperAdmin
               </span>
             </div>
-            <p className="text-[11px] text-zinc-400 font-mono truncate">admin@gmail.com • Admin@123</p>
+            <p className="text-[11px] text-zinc-400 font-mono truncate">
+              admin@gmail.com • Admin@123
+            </p>
           </div>
         </div>
 

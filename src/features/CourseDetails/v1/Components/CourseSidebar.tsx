@@ -86,19 +86,39 @@ export default function CourseSidebar() {
 
       {/* Quick Information */}
       <Card className="p-5 sm:p-6">
-        <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-400">Institutional Specs</h3>
+        <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-400">
+          Institutional Specs
+        </h3>
 
         <div className="mt-5 space-y-4">
-          <InfoRow icon={<IndianRupee size={16} />} title="Standard Tuition Fee" value="₹75,000 / Year" />
-          <InfoRow icon={<Clock3 size={16} />} title="Program Duration" value="3 Years (6 Semesters)" />
-          <InfoRow icon={<GraduationCap size={16} />} title="Degree Conferred" value="Bachelor of Computer Applications" />
-          <InfoRow icon={<Users size={16} />} title="Approved Intake" value="120 Sanctioned Seats" />
+          <InfoRow
+            icon={<IndianRupee size={16} />}
+            title="Standard Tuition Fee"
+            value="₹75,000 / Year"
+          />
+          <InfoRow
+            icon={<Clock3 size={16} />}
+            title="Program Duration"
+            value="3 Years (6 Semesters)"
+          />
+          <InfoRow
+            icon={<GraduationCap size={16} />}
+            title="Degree Conferred"
+            value="Bachelor of Computer Applications"
+          />
+          <InfoRow
+            icon={<Users size={16} />}
+            title="Approved Intake"
+            value="120 Sanctioned Seats"
+          />
         </div>
       </Card>
 
       {/* Coordinator */}
       <Card className="p-5 sm:p-6">
-        <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-400">Department Coordinator</h3>
+        <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-400">
+          Department Coordinator
+        </h3>
 
         <div className="mt-4 flex items-center gap-3.5">
           <img

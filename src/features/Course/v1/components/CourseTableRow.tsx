@@ -27,7 +27,9 @@ const CourseTableRow: React.FC<CourseTableRowProps> = ({ course }) => {
       </td>
       <td className="px-4 py-3.5">
         <div className="font-semibold text-sm text-white">{course.courseName}</div>
-        <div className="text-xs text-zinc-500 mt-0.5">{course.Department || "Engineering & Technology"}</div>
+        <div className="text-xs text-zinc-500 mt-0.5">
+          {course.Department || "Engineering & Technology"}
+        </div>
       </td>
       <td className="px-4 py-3.5 font-mono text-xs text-zinc-300">
         ₹{course.fee || course.coursePrice}
@@ -38,7 +40,7 @@ const CourseTableRow: React.FC<CourseTableRowProps> = ({ course }) => {
       <td className="px-4 py-3.5 text-right">
         <div className="flex items-center justify-end gap-3 text-zinc-400">
           <button
-            onClick={() => navigate("/course-view")}
+            onClick={() => navigate(`/course-view?id=${course._id || course.courseCode}`)}
             aria-label={`View ${course.courseName}`}
             title="View Course Curriculum"
             className="p-1.5 rounded-lg hover:text-indigo-400 hover:bg-zinc-800 transition"

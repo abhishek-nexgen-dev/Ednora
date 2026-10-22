@@ -7,13 +7,14 @@ import { DashboardApiResponse } from "./types/DashboardApiResponse";
 import useAuthStorage from "../../login/v1/hooks/useAuthStorage";
 import { useSocket } from "../../../Utils/useSocket";
 import api from "../../../Utils/api.utils";
-import { BackendStudent } from "../../../types/backend.types";
+import { BackendStudent, BackendCourse } from "../../../types/backend.types";
 import {
   GraduationCap,
   Layers,
   Megaphone,
   Briefcase,
   Wallet,
+  Quote,
   ArrowRight,
   Clock,
   CheckCircle2,
@@ -50,7 +51,7 @@ const DashboardPage = () => {
         api.get("/api/v1/contact/admin/getContact"),
       ]);
 
-      let coursesList: any[] = [];
+      let coursesList: BackendCourse[] = [];
       if (cRes.status === "fulfilled" && cRes.value.data?.data) {
         coursesList = cRes.value.data.data;
       }
@@ -143,8 +144,7 @@ const DashboardPage = () => {
 
       return {
         ...card,
-        value:
-          apiData?.value !== undefined && apiData?.value !== 0 ? apiData.value : fallbackVal,
+        value: apiData?.value !== undefined && apiData?.value !== 0 ? apiData.value : fallbackVal,
         color: apiData?.color ?? "#6366F1",
       };
     });
@@ -179,7 +179,8 @@ const DashboardPage = () => {
               Welcome back, {user?.name || "Prof. R. K. Sharma"}
             </h1>
             <p className="mt-1 text-xs sm:text-sm text-zinc-400">
-              Overview of student admissions, curriculum, tuition revenue, and background message queues.
+              Overview of student admissions, curriculum, tuition revenue, and background message
+              queues.
             </p>
           </div>
 
@@ -238,7 +239,8 @@ const DashboardPage = () => {
             <div className="flex items-center justify-between border-b border-zinc-800/80 pb-3 sm:pb-4">
               <div>
                 <h3 className="text-sm sm:text-base font-bold text-white flex items-center gap-2">
-                  <GraduationCap size={18} className="text-indigo-400" /> Recent Admission Applications
+                  <GraduationCap size={18} className="text-indigo-400" /> Recent Admission
+                  Applications
                 </h3>
                 <p className="text-xs text-zinc-500 mt-0.5">
                   Verify qualifying credentials and approve enrollment into academic terms
@@ -390,7 +392,9 @@ const DashboardPage = () => {
                     ) : (
                       <tr>
                         <td colSpan={5} className="py-8 text-center text-zinc-500">
-                          {loading ? "Loading admission records..." : "No recent admission applications."}
+                          {loading
+                            ? "Loading admission records..."
+                            : "No recent admission applications."}
                         </td>
                       </tr>
                     )}
@@ -424,7 +428,10 @@ const DashboardPage = () => {
                       <p className="text-[11px] text-zinc-500">Add course, fees, and syllabus</p>
                     </div>
                   </div>
-                  <ArrowRight size={14} className="text-zinc-500 group-hover:text-white transition" />
+                  <ArrowRight
+                    size={14}
+                    className="text-zinc-500 group-hover:text-white transition"
+                  />
                 </Link>
 
                 <Link
@@ -440,7 +447,10 @@ const DashboardPage = () => {
                       <p className="text-[11px] text-zinc-500">Appoint professor or lecturer</p>
                     </div>
                   </div>
-                  <ArrowRight size={14} className="text-zinc-500 group-hover:text-white transition" />
+                  <ArrowRight
+                    size={14}
+                    className="text-zinc-500 group-hover:text-white transition"
+                  />
                 </Link>
 
                 <Link
@@ -456,7 +466,10 @@ const DashboardPage = () => {
                       <p className="text-[11px] text-zinc-500">Dispatch alert to queues</p>
                     </div>
                   </div>
-                  <ArrowRight size={14} className="text-zinc-500 group-hover:text-white transition" />
+                  <ArrowRight
+                    size={14}
+                    className="text-zinc-500 group-hover:text-white transition"
+                  />
                 </Link>
 
                 <Link
@@ -472,13 +485,39 @@ const DashboardPage = () => {
                       <p className="text-[11px] text-zinc-500">Collect payment & issue receipt</p>
                     </div>
                   </div>
-                  <ArrowRight size={14} className="text-zinc-500 group-hover:text-white transition" />
+                  <ArrowRight
+                    size={14}
+                    className="text-zinc-500 group-hover:text-white transition"
+                  />
+                </Link>
+
+                <Link
+                  to="/testimonials"
+                  className="flex items-center justify-between p-3 sm:p-3.5 rounded-2xl bg-zinc-900/70 border border-zinc-800/80 hover:bg-zinc-800/60 transition group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-pink-500/10 text-pink-400 border border-pink-500/20">
+                      <Quote size={16} />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-white">Student Testimonials</p>
+                      <p className="text-[11px] text-zinc-500">
+                        Alumni feedback & corporate placement
+                      </p>
+                    </div>
+                  </div>
+                  <ArrowRight
+                    size={14}
+                    className="text-zinc-500 group-hover:text-white transition"
+                  />
                 </Link>
               </div>
             </div>
 
             <div className="p-3.5 sm:p-4 rounded-2xl bg-indigo-950/20 border border-indigo-500/20 text-xs text-indigo-300">
-              <span className="font-semibold block text-indigo-200 mb-0.5">Central Institute ITM</span>
+              <span className="font-semibold block text-indigo-200 mb-0.5">
+                Central Institute ITM
+              </span>
               Connected directly to production backend at ciitm-backend.onrender.com.
             </div>
           </div>
