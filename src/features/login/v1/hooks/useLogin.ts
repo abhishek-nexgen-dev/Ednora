@@ -33,14 +33,19 @@ export default function useLogin() {
         const response = await api.post(`/api/v1/auth/login`, { email, password });
         return response.data;
       } catch (err: unknown) {
-        // If credentials match default test credentials, allow login with valid 10-year admin JWT
-        if (email === "admin@gmail.com" && password === "Admin@123") {
+        const testEmail =
+          (typeof import.meta !== "undefined" && import.meta.env?.VITE_TEST_ADMIN_EMAIL) || "admin@gmail.com";
+        const testPassword =
+          (typeof import.meta !== "undefined" && import.meta.env?.VITE_TEST_ADMIN_PASSWORD) || "Admin@123";
+
+        // If credentials match configured admin test credentials, allow login with valid admin JWT
+        if (email === testEmail && password === testPassword) {
           return {
             token: DEFAULT_ADMIN_TOKEN,
             user: {
               _id: "6740b2f5a8c43d9124a87211",
               name: "Prof. R. K. Sharma",
-              email: "admin@gmail.com",
+              email: testEmail,
               role: "admin",
             },
           };

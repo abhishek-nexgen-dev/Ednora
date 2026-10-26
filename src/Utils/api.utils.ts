@@ -14,7 +14,7 @@ const api = axios.create({
  * automatically repairs the token and syncs storage.
  */
 export function getValidToken(): string {
-  let token = useAuthStorage.getState().token;
+  let token: string = useAuthStorage.getState().token || DEFAULT_ADMIN_TOKEN || "";
 
   if (
     !token ||
@@ -23,14 +23,16 @@ export function getValidToken(): string {
     token === "ciitm_admin_session_token" ||
     token.includes("1791344170") // Replace expired token
   ) {
-    token = DEFAULT_ADMIN_TOKEN;
-    useAuthStorage.getState().setToken(DEFAULT_ADMIN_TOKEN);
-    if (typeof localStorage !== "undefined") {
-      localStorage.setItem("ciitm_admin_token", DEFAULT_ADMIN_TOKEN);
+    token = DEFAULT_ADMIN_TOKEN || "";
+    if (token) {
+      useAuthStorage.getState().setToken(token);
+      if (typeof localStorage !== "undefined") {
+        localStorage.setItem("ciitm_admin_token", token);
+      }
     }
   }
 
-  token = token.trim();
+  token = (token || "").trim();
   while (
     (token.startsWith('"') && token.endsWith('"')) ||
     (token.startsWith("'") && token.endsWith("'"))
@@ -43,10 +45,10 @@ export function getValidToken(): string {
   }
 
   if (token.split(".").length !== 3) {
-    token = DEFAULT_ADMIN_TOKEN;
+    token = DEFAULT_ADMIN_TOKEN || "";
   }
 
-  return token;
+  return token || "";
 }
 
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
@@ -83,17 +85,19 @@ api.interceptors.response.use(
       originalRequest._hasRetriedWithFreshToken = true;
       const freshToken = DEFAULT_ADMIN_TOKEN;
 
-      useAuthStorage.getState().setToken(freshToken);
-      if (typeof localStorage !== "undefined") {
-        localStorage.setItem("ciitm_admin_token", freshToken);
+      if (freshToken) {
+        useAuthStorage.getState().setToken(freshToken);
+        if (typeof localStorage !== "undefined") {
+          localStorage.setItem("ciitm_admin_token", freshToken);
+        }
+
+        originalRequest.headers = originalRequest.headers || {};
+        originalRequest.headers.Authorization = `Bearer ${freshToken}`;
+        originalRequest.headers.token = freshToken;
+        originalRequest.headers["x-access-token"] = freshToken;
+
+        return api(originalRequest);
       }
-
-      originalRequest.headers = originalRequest.headers || {};
-      originalRequest.headers.Authorization = `Bearer ${freshToken}`;
-      originalRequest.headers.token = freshToken;
-      originalRequest.headers["x-access-token"] = freshToken;
-
-      return api(originalRequest);
     }
 
     return Promise.reject(error);

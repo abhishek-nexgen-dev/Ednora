@@ -17,7 +17,7 @@ type AuthStorageState = {
 };
 
 export const DEFAULT_ADMIN_TOKEN =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc5MzAwNTM3MSwiZXhwIjoyMTA4MzY1MzcxfQ.UrJS3u8RdblbWiCyviTWKoiXiTrxHmgymTZK3J5ZhXU";
+  (typeof import.meta !== "undefined" && import.meta.env?.VITE_ADMIN_TOKEN) || "";
 
 function getStoredToken(): string {
   if (typeof localStorage === "undefined") return DEFAULT_ADMIN_TOKEN;
