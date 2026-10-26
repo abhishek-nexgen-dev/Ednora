@@ -1,12 +1,12 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
 fn greet(name: &str) -> String {
-    format!("Hello, {}! Connected to CIITM Desktop Rust Core.", name)
+    format!("Hello, {}! Connected to Ednora Desktop Rust Core.", name)
 }
 
 #[tauri::command]
 fn get_app_version() -> String {
-    "0.1.0-enterprise".to_string()
+    "1.0.0-enterprise".to_string()
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]

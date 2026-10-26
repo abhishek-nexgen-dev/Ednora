@@ -165,7 +165,7 @@ export default function InquiriesPage() {
     const recipientName = selectedInquiry.cName || selectedInquiry.name || "Candidate";
 
     window.location.href = `mailto:${recipientEmail}?subject=${encodeURIComponent(
-      `Re: CIITM Admissions Inquiry - Response for ${recipientName}`,
+      `Re: Ednora Admissions Inquiry - Response for ${recipientName}`,
     )}&body=${encodeURIComponent(replyText)}`;
 
     toast.success(`Mail client launched for ${recipientEmail}!`);
@@ -314,7 +314,7 @@ export default function InquiriesPage() {
                   <button
                     onClick={() => {
                       setSelectedInquiry(inq);
-                      setReplyText(`Dear ${name},\n\nThank you for contacting Central Institute of Information Technology & Management (CIITM).\n\nIn response to your query regarding: "${message.slice(0, 80)}..."\n\nSincerely,\nAdmissions & Outreach Office\nCIITM Dhanbad`);
+                      setReplyText(`Dear ${name},\n\nThank you for contacting Ednora — Where Knowledge Finds Its Future.\n\nIn response to your query regarding: "${message.slice(0, 80)}..."\n\nSincerely,\nAdmissions & Outreach Office\nEdnora Institutional Directorate`);
                     }}
                     className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white shadow-sm transition active:scale-95"
                   >
@@ -381,7 +381,7 @@ export default function InquiriesPage() {
                   rows={5}
                   value={replyText}
                   onChange={(e) => setReplyText(e.target.value)}
-                  placeholder="Dear Candidate, Thank you for reaching out to CIITM..."
+                  placeholder="Dear Candidate, Thank you for reaching out to Ednora..."
                   className="w-full mt-1.5 px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-xs sm:text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500 leading-relaxed font-sans"
                 />
               </div>

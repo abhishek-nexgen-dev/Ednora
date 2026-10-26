@@ -2,5 +2,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    ciitm_desktop_lib::run()
+    ednora_lib::run()
 }

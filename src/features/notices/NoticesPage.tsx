@@ -73,7 +73,7 @@ export default function NoticesPage() {
 
   // Create text document blob if no file is uploaded
   const createNoticeDocBlob = (title: string, content: string): Blob => {
-    const docText = `CENTRAL INSTITUTE OF INFORMATION TECHNOLOGY & MANAGEMENT (CIITM)
+    const docText = `EDNORA — WHERE KNOWLEDGE FINDS ITS FUTURE
 OFFICIAL CIRCULAR / NOTIFICATION
 ==================================================
 Subject: ${title}
@@ -85,8 +85,8 @@ ${content}
 
 --------------------------------------------------
 Admissions & Academic Administration Office
-CIITM Campus, Dhanbad
-Website: https://ciitm.in | Email: contact@ciitm.edu`;
+Ednora Campus Directorate
+Website: https://ednora.edu | Email: contact@ednora.edu`;
     return new Blob([docText], { type: "text/plain" });
   };
 
@@ -371,7 +371,7 @@ Website: https://ciitm.in | Email: contact@ciitm.edu`;
                 <div className="flex items-center gap-2">
                   <Building2 size={14} className="text-indigo-400" />
                   <span className="text-xs uppercase tracking-wider font-semibold text-indigo-400">
-                    CIITM Official Circular
+                    Ednora Official Circular
                   </span>
                 </div>
                 <h2 className="text-lg sm:text-xl font-bold text-white leading-snug">

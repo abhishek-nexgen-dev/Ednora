@@ -26,7 +26,7 @@ const Template = () => {
               <div className="h-7 w-7 rounded-lg bg-indigo-600 flex items-center justify-center text-white">
                 <Building2 size={16} />
               </div>
-              <span className="font-bold text-sm tracking-tight">CIITM Admin</span>
+              <span className="font-bold text-sm tracking-tight">Ednora</span>
             </div>
           </div>
 

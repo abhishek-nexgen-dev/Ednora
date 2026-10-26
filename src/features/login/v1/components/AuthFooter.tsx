@@ -3,12 +3,12 @@ import { LifeBuoy, ShieldAlert, FileText } from "lucide-react";
 
 export function AuthFooter() {
   const showHelpdesk = () => {
-    toast.info("CIITM IT Helpdesk: Contact support@ciitm.edu or Ext. 104 (Mon-Sat, 9AM-6PM IST)");
+    toast.info("Ednora IT Helpdesk: Contact support@ednora.edu or Ext. 104 (Mon-Sat, 9AM-6PM IST)");
   };
 
   const showPolicy = (title: string) => {
     toast.info(
-      `${title}: CIITM Security Directive 2026. All administrator access attempts are audited.`,
+      `${title}: Ednora Security Directive 2026. All administrator access attempts are audited.`,
     );
   };
 

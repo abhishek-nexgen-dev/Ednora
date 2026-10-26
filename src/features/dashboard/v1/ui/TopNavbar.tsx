@@ -45,7 +45,7 @@ function TopNavbar() {
   const handleLogout = () => {
     logout();
     navigate("/");
-    toast.info("Signed out of CIITM Admin Session.");
+    toast.info("Signed out of Ednora Admin Session.");
   };
 
   return (
@@ -55,8 +55,8 @@ function TopNavbar() {
         <div className="flex items-center gap-2.5">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-300 border border-indigo-500/25 shadow-sm">
             <Shield size={12} className="text-indigo-400" />
-            <span className="hidden sm:inline">CIITM ERP Enterprise</span>
-            <span className="sm:hidden">CIITM</span>
+            <span className="hidden sm:inline">Ednora OS</span>
+            <span className="sm:hidden">Ednora</span>
           </span>
 
           {isTauri ? (
@@ -102,7 +102,7 @@ function TopNavbar() {
           {/* Help Desk */}
           <button
             onClick={() =>
-              toast.info("CIITM Technical Support: admin@ciitm.edu | Hotline: +91 6202665784")
+              toast.info("Ednora Support: support@ednora.edu | Hotline: +91 6202665784")
             }
             className="p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800/80 border border-transparent hover:border-zinc-700/80 transition"
             title="Institutional Help Desk"

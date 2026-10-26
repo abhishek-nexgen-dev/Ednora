@@ -1,19 +1,19 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "ciitm-desktop",
-  "version": "0.1.0",
-  "identifier": "com.ciitm.desktop",
+  "productName": "Ednora",
+  "version": "1.0.0",
+  "identifier": "com.ednora.desktop",
   "build": {
     "beforeDevCommand": "pnpm dev || npm run dev",
-    "devUrl": "http://localhost:3000",
-    "beforeBuildCommand": "pnpm build || npm run build",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "pnpm build",
     "frontendDist": "../dist"
   },
   "app": {
     "windows": [
       {
         "label": "main",
-        "title": "CIITM Enterprise ERP",
+        "title": "Ednora — Where Knowledge Finds Its Future",
         "width": 1280,
         "height": 800,
         "minWidth": 960,
@@ -38,7 +38,7 @@
       "icons/icon.ico"
     ],
     "category": "Education",
-    "shortDescription": "CIITM Campus ERP & Administration Desktop Client",
-    "longDescription": "Central Institute of Information Technology & Management Institutional ERP Desktop System for academic administration, admissions, fees, faculty, and circulars."
+    "shortDescription": "Ednora — Where Knowledge Finds Its Future",
+    "longDescription": "Ednora Institutional Academic & ERP Desktop Platform. Where Knowledge Finds Its Future."
   }
 }
