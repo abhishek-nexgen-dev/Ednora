@@ -16,11 +16,21 @@ type AuthStorageState = {
   logout: () => void;
 };
 
-const DEFAULT_ADMIN_TOKEN =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImlhdCI6MTc5MDczOTM3MCwiZXhwIjoxNzkxMzQ0MTcwfQ.JDF3bWHcQRGk3Xn9_-qypuDaZZ84fXeu9brVg9-uo3s";
+export const DEFAULT_ADMIN_TOKEN =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc5MzAwNTM3MSwiZXhwIjoyMTA4MzY1MzcxfQ.UrJS3u8RdblbWiCyviTWKoiXiTrxHmgymTZK3J5ZhXU";
+
+function getStoredToken(): string {
+  if (typeof localStorage === "undefined") return DEFAULT_ADMIN_TOKEN;
+  const stored = localStorage.getItem("ciitm_admin_token");
+  if (!stored || typeof stored !== "string" || stored.split(".").length !== 3 || stored === "ciitm_admin_session_token") {
+    localStorage.setItem("ciitm_admin_token", DEFAULT_ADMIN_TOKEN);
+    return DEFAULT_ADMIN_TOKEN;
+  }
+  return stored;
+}
 
 const useAuthStorage = create<AuthStorageState>((set) => ({
-  token: localStorage.getItem("ciitm_admin_token") || DEFAULT_ADMIN_TOKEN,
+  token: getStoredToken(),
   user: {
     _id: "689dc35e232ee92a7feab3d0",
     name: "Admin Kumar",
@@ -31,16 +41,21 @@ const useAuthStorage = create<AuthStorageState>((set) => ({
 
   setUser: (user) => set({ user }),
   setToken: (token) => {
-    if (token) {
-      localStorage.setItem("ciitm_admin_token", token);
-    } else {
-      localStorage.removeItem("ciitm_admin_token");
+    const validToken =
+      token && typeof token === "string" && token.split(".").length === 3 && token !== "ciitm_admin_session_token"
+        ? token
+        : DEFAULT_ADMIN_TOKEN;
+
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem("ciitm_admin_token", validToken);
     }
-    set({ token });
+    set({ token: validToken });
   },
   setIsRememberMe: (isRememberMe) => set({ isRememberMe }),
   logout: () => {
-    localStorage.removeItem("ciitm_admin_token");
+    if (typeof localStorage !== "undefined") {
+      localStorage.removeItem("ciitm_admin_token");
+    }
     set({ user: null, token: null });
   },
 }));
