@@ -30,9 +30,9 @@ const Template = () => {
                   (e.currentTarget as HTMLImageElement).src = EDNORA_LOGO_URL;
                 }}
                 alt="Ednora"
-                className="h-6 w-auto object-contain"
+                className="h-full w-1/2 object-contain"
               />
-              <span className="font-bold text-sm tracking-tight">Ednora</span>
+         
             </div>
           </div>
 

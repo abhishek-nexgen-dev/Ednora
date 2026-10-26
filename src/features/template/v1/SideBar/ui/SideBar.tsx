@@ -18,29 +18,22 @@ export const Sidebar = () => {
   };
 
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-[#08090D] border-r border-zinc-800/80">
+    <div className="flex flex-col h-full  bg-[#08090D] border-r border-zinc-800/80">
       {/* Brand Header */}
       <div className="h-16 lg:h-20 px-4 sm:px-5 flex items-center justify-between border-b border-zinc-800/60 shrink-0">
-        <div className="flex items-center gap-3 overflow-hidden">
-          <div className="h-9 w-9 sm:h-10 sm:w-10 shrink-0 rounded-xl bg-zinc-900 border border-zinc-800 p-1 flex items-center justify-center shadow-lg shadow-indigo-500/10">
-            <img
+        <div className="flex items-center gap-3 w-[80%] overflow-hidden ">
+         
+          {(!collapsed || mobileOpen) && (
+            <div className="truncate  flex items-start">
+              <img
               src={EDNORA_LOGO_LOCAL}
               onError={(e) => {
                 (e.currentTarget as HTMLImageElement).src = EDNORA_LOGO_URL;
               }}
               alt="Ednora"
-              className="h-full w-full object-contain"
+              className="h-[80%] w-[60%] object-cover"
             />
-          </div>
-          {(!collapsed || mobileOpen) && (
-            <div className="truncate">
-              <h1 className="font-bold text-base sm:text-lg text-white tracking-tight flex items-center gap-1.5 sm:gap-2">
-                Ednora
-                <span className="text-[9px] sm:text-[10px] uppercase font-semibold tracking-wider px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
-                  ERP
-                </span>
-              </h1>
-              <p className="text-[11px] text-zinc-400 truncate">Where Knowledge Finds Its Future</p>
+           
             </div>
           )}
         </div>
@@ -51,7 +44,7 @@ export const Sidebar = () => {
           className="lg:hidden p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800"
           aria-label="Close menu"
         >
-          <X size={18} />
+          <X size={22} />
         </button>
 
         {/* Desktop Collapse Toggle */}
