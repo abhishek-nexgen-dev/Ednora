@@ -189,7 +189,7 @@ function Header() {
       </div>
 
       <h1 className="mt-4 text-2xl sm:text-3xl font-bold tracking-tight text-white flex items-center justify-center gap-2">
-        CIITM ERP
+        Academiq
       </h1>
 
       <p className="mt-1 text-xs sm:text-sm text-zinc-400">
