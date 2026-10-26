@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Academiq",
-  "version": "1.0.0",
-  "identifier": "com.academiq.desktop",
+  "productName": "ciitm-desktop",
+  "version": "0.1.0",
+  "identifier": "com.ciitm.desktop",
   "build": {
     "beforeDevCommand": "pnpm dev || npm run dev",
     "devUrl": "http://localhost:3000",
@@ -13,7 +13,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "Academiq — Academic Operating System",
+        "title": "CIITM Enterprise ERP",
         "width": 1280,
         "height": 800,
         "minWidth": 960,
@@ -38,7 +38,7 @@
       "icons/icon.ico"
     ],
     "category": "Education",
-    "shortDescription": "Academiq Campus ERP & Academic Operating System",
-    "longDescription": "Academiq Institutional ERP Desktop System for academic administration, admissions, fees, faculty, and circulars."
+    "shortDescription": "CIITM Campus ERP & Administration Desktop Client",
+    "longDescription": "Central Institute of Information Technology & Management Institutional ERP Desktop System for academic administration, admissions, fees, faculty, and circulars."
   }
 }

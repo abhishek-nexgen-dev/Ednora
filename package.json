@@ -1,6 +1,5 @@
 {
-  "name": "academiq-desktop",
-  "description": "Academiq — Modern Academic Operating System & Campus ERP",
+  "name": "ciitm-desktop",
   "private": true,
   "version": "0.1.0",
   "type": "module",

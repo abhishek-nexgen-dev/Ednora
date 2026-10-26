@@ -212,7 +212,7 @@ export default function AdmissionsPage() {
               Student Application & Admission Review
             </h1>
             <p className="text-xs sm:text-sm text-zinc-400 mt-1">
-              Verify credentials, review qualifying scores, and approve student admissions into the institution.
+              Verify credentials, review qualifying scores, and approve student admissions into CIITM.
             </p>
           </div>
 

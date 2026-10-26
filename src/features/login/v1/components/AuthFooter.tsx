@@ -3,12 +3,12 @@ import { LifeBuoy, ShieldAlert, FileText } from "lucide-react";
 
 export function AuthFooter() {
   const showHelpdesk = () => {
-    toast.info("Academiq IT Helpdesk: Contact support@academiq.io or Ext. 104 (Mon-Sat, 9AM-6PM IST)");
+    toast.info("CIITM IT Helpdesk: Contact support@ciitm.edu or Ext. 104 (Mon-Sat, 9AM-6PM IST)");
   };
 
   const showPolicy = (title: string) => {
     toast.info(
-      `${title}: Academiq Security Directive 2026. All administrator access attempts are audited.`,
+      `${title}: CIITM Security Directive 2026. All administrator access attempts are audited.`,
     );
   };
 

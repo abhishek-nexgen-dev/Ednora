@@ -164,7 +164,7 @@ export default function ForgotPasswordPage() {
               Reset Credentials
             </h1>
             <p className="text-xs sm:text-sm text-zinc-400 mt-1">
-              Academiq Institutional Administrator Access Recovery
+              CIITM Institutional Administrator Access Recovery
             </p>
           </div>
 
@@ -536,7 +536,7 @@ export default function ForgotPasswordPage() {
 
         {/* Security Footer Notice */}
         <p className="text-center text-[11px] text-zinc-600">
-          Academiq Security Protocol v4.2 • Protected by TLS 1.3 Strict & AMQP Clearance
+          CIITM Security Protocol v4.2 • Protected by TLS 1.3 Strict & AMQP Clearance
         </p>
       </div>
     </main>

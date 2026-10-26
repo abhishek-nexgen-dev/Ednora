@@ -27,12 +27,12 @@ export const Sidebar = () => {
           {(!collapsed || mobileOpen) && (
             <div className="truncate">
               <h1 className="font-bold text-base sm:text-lg text-white tracking-tight flex items-center gap-1.5 sm:gap-2">
-                Academiq
+                CIITM ERP
                 <span className="text-[9px] sm:text-[10px] uppercase font-semibold tracking-wider px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
-                  OS
+                  Admin
                 </span>
               </h1>
-              <p className="text-[11px] text-zinc-400 truncate">Academic Operating System</p>
+              <p className="text-[11px] text-zinc-400 truncate">Central Institute ITM</p>
             </div>
           )}
         </div>
