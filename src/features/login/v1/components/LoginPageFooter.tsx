@@ -14,7 +14,7 @@ const LoginPageFooter = () => {
           className="flex flex-wrap items-center justify-center gap-x-5 gap-y-3"
         >
           <a
-            href="https://github.com/abhishek-nexgen-dev/ciitm-desktop"
+            href="https://github.com/abhishek-nexgen-dev/ednora"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 text-zinc-400 transition-colors hover:text-white"
@@ -26,7 +26,7 @@ const LoginPageFooter = () => {
           </a>
 
           <a
-            href="https://github.com/abhishek-nexgen-dev/ciitm-desktop/issues"
+            href="https://github.com/abhishek-nexgen-dev/ednora/issues"
             target="_blank"
             rel="noopener noreferrer"
             className="text-zinc-400 transition-colors hover:text-white"

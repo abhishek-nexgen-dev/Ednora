@@ -1,7 +1,7 @@
 import axios, { InternalAxiosRequestConfig } from "axios";
 import useAuthStorage, { DEFAULT_ADMIN_TOKEN } from "../features/login/v1/hooks/useAuthStorage";
 
-export const API_BASE_URL = import.meta.env.VITE_API_URL || "https://ciitm-backend.onrender.com";
+export const API_BASE_URL = import.meta.env.VITE_API_URL || "https://ednora-backend.onrender.com";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -20,6 +20,7 @@ export function getValidToken(): string {
     !token ||
     typeof token !== "string" ||
     token.split(".").length !== 3 ||
+    token === "ednora_admin_session_token" ||
     token === "ciitm_admin_session_token" ||
     token.includes("1791344170") // Replace expired token
   ) {
@@ -27,7 +28,7 @@ export function getValidToken(): string {
     if (token) {
       useAuthStorage.getState().setToken(token);
       if (typeof localStorage !== "undefined") {
-        localStorage.setItem("ciitm_admin_token", token);
+        localStorage.setItem("ednora_admin_token", token);
       }
     }
   }
@@ -88,7 +89,7 @@ api.interceptors.response.use(
       if (freshToken) {
         useAuthStorage.getState().setToken(freshToken);
         if (typeof localStorage !== "undefined") {
-          localStorage.setItem("ciitm_admin_token", freshToken);
+          localStorage.setItem("ednora_admin_token", freshToken);
         }
 
         originalRequest.headers = originalRequest.headers || {};

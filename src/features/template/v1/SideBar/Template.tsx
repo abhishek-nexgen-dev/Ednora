@@ -1,8 +1,9 @@
 import { Outlet } from "react-router-dom";
 import { Sidebar } from "./ui/SideBar";
-import { Menu, Building2 } from "lucide-react";
+import { Menu } from "lucide-react";
 import { useSidebarStore } from "./store/sidebar.store";
 import useAuthStorage from "../../../login/v1/hooks/useAuthStorage";
+import { EDNORA_LOGO_LOCAL, EDNORA_LOGO_URL } from "../../../../constant/logo.constant";
 
 const Template = () => {
   const toggleMobile = useSidebarStore((state) => state.toggleMobile);
@@ -23,9 +24,14 @@ const Template = () => {
               <Menu size={20} />
             </button>
             <div className="flex items-center gap-2">
-              <div className="h-7 w-7 rounded-lg bg-indigo-600 flex items-center justify-center text-white">
-                <Building2 size={16} />
-              </div>
+              <img
+                src={EDNORA_LOGO_LOCAL}
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = EDNORA_LOGO_URL;
+                }}
+                alt="Ednora"
+                className="h-6 w-auto object-contain"
+              />
               <span className="font-bold text-sm tracking-tight">Ednora</span>
             </div>
           </div>

@@ -54,7 +54,7 @@ export default function SystemPage() {
       time: new Date().toLocaleTimeString(),
       queue: "audit_queue",
       status: "CONNECTED",
-      msg: "System probe connected to https://ciitm-backend.onrender.com",
+      msg: "System probe connected to https://ednora-backend.onrender.com",
     },
   ]);
 

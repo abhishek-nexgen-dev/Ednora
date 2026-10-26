@@ -1,9 +1,10 @@
-import { Building2, ChevronLeft, ChevronRight, LogOut, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, LogOut, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useSidebarStore } from "../store/sidebar.store";
 import { SidebarItem } from "./SidebarItem";
 import { sidebarConfig } from "../config/sidebar.config";
 import useAuthStorage from "../../../../login/v1/hooks/useAuthStorage";
+import { EDNORA_LOGO_LOCAL, EDNORA_LOGO_URL } from "../../../../../constant/logo.constant";
 
 export const Sidebar = () => {
   const { collapsed, toggleCollapse, mobileOpen, setMobileOpen } = useSidebarStore();
@@ -21,8 +22,15 @@ export const Sidebar = () => {
       {/* Brand Header */}
       <div className="h-16 lg:h-20 px-4 sm:px-5 flex items-center justify-between border-b border-zinc-800/60 shrink-0">
         <div className="flex items-center gap-3 overflow-hidden">
-          <div className="h-9 w-9 sm:h-10 sm:w-10 shrink-0 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
-            <Building2 size={20} />
+          <div className="h-9 w-9 sm:h-10 sm:w-10 shrink-0 rounded-xl bg-zinc-900 border border-zinc-800 p-1 flex items-center justify-center shadow-lg shadow-indigo-500/10">
+            <img
+              src={EDNORA_LOGO_LOCAL}
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = EDNORA_LOGO_URL;
+              }}
+              alt="Ednora"
+              className="h-full w-full object-contain"
+            />
           </div>
           {(!collapsed || mobileOpen) && (
             <div className="truncate">

@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
-  Building2,
   Mail,
   Lock,
   Eye,
@@ -20,6 +19,7 @@ import { getErrorMessage } from "../../../../Utils/api.utils";
 import { AuthFooter } from "./AuthFooter";
 import Input from "../../../../Components/Input";
 import useAuthStorage from "../hooks/useAuthStorage";
+import { EDNORA_LOGO_LOCAL, EDNORA_LOGO_URL } from "../../../../constant/logo.constant";
 
 export function LoginCard() {
   const { watch, setValue, formState, handleSubmit } = useLoginForm();
@@ -184,11 +184,18 @@ export function LoginCard() {
 function Header() {
   return (
     <div className="text-center">
-      <div className="mx-auto flex h-14 w-14 sm:h-16 sm:w-16 text-white items-center justify-center rounded-2xl border border-indigo-500/30 bg-gradient-to-br from-indigo-500/20 via-indigo-600/10 to-violet-600/20 shadow-lg shadow-indigo-500/20">
-        <Building2 size={28} className="text-indigo-400" />
+      <div className="mx-auto flex h-16 w-auto max-w-[220px] items-center justify-center mb-3">
+        <img
+          src={EDNORA_LOGO_LOCAL}
+          onError={(e) => {
+            (e.currentTarget as HTMLImageElement).src = EDNORA_LOGO_URL;
+          }}
+          alt="Ednora Logo"
+          className="h-16 w-auto max-w-full object-contain drop-shadow-[0_4px_16px_rgba(99,102,241,0.25)]"
+        />
       </div>
 
-      <h1 className="mt-4 text-2xl sm:text-3xl font-bold tracking-tight text-white flex items-center justify-center gap-2">
+      <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white flex items-center justify-center gap-2">
         Ednora
       </h1>
 

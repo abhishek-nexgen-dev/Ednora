@@ -606,7 +606,7 @@ const DashboardPage = () => {
                 </span>
               </div>
               <p className="text-[11px] text-zinc-400">
-                Connected to production database at ciitm-backend.onrender.com.
+                Connected to production database at ednora-backend.onrender.com.
               </p>
             </div>
           </div>

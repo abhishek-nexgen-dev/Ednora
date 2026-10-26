@@ -367,7 +367,7 @@ export default function TeacherPage() {
                 <input
                   type="email"
                   required
-                  placeholder="name@ciitm.edu"
+                  placeholder="name@ednora.edu"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="w-full mt-1 px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500"

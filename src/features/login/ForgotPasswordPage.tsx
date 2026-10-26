@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
-  Building2,
   ArrowLeft,
   Mail,
   KeyRound,
@@ -19,6 +18,7 @@ import {
 } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import api, { getErrorMessage } from "../../Utils/api.utils";
+import { EDNORA_LOGO_LOCAL, EDNORA_LOGO_URL } from "../../constant/logo.constant";
 
 export default function ForgotPasswordPage() {
   const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -152,8 +152,15 @@ export default function ForgotPasswordPage() {
       <div className="w-full max-w-md mx-auto space-y-6 z-10">
         {/* Brand Header */}
         <div className="text-center space-y-3">
-          <div className="mx-auto flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-2xl border border-indigo-500/30 bg-gradient-to-br from-indigo-500/20 via-indigo-600/15 to-violet-600/20 text-white shadow-lg shadow-indigo-500/20">
-            <Building2 size={28} className="text-indigo-400" />
+          <div className="mx-auto flex h-16 w-auto max-w-[200px] items-center justify-center mb-1">
+            <img
+              src={EDNORA_LOGO_LOCAL}
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = EDNORA_LOGO_URL;
+              }}
+              alt="Ednora Logo"
+              className="h-14 w-auto max-w-full object-contain drop-shadow-[0_4px_16px_rgba(99,102,241,0.25)]"
+            />
           </div>
 
           <div>

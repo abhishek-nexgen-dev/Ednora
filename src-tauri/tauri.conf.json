@@ -4,9 +4,9 @@
   "version": "1.0.0",
   "identifier": "com.ednora.desktop",
   "build": {
-    "beforeDevCommand": "pnpm dev || npm run dev",
+    "beforeDevCommand": "./node_modules/.bin/vite",
     "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "pnpm build",
+    "beforeBuildCommand": "./node_modules/.bin/tsc && ./node_modules/.bin/vite build",
     "frontendDist": "../dist"
   },
   "app": {

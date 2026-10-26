@@ -3,7 +3,6 @@ import {
   Bell,
   Grid3X3,
   CircleHelp,
-  Shield,
   Laptop,
   Globe,
   LogOut,
@@ -12,6 +11,7 @@ import {
 import useAuthStorage from "../../../login/v1/hooks/useAuthStorage";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { EDNORA_LOGO_LOCAL, EDNORA_LOGO_URL } from "../../../../constant/logo.constant";
 
 function TopNavbar() {
   const user = useAuthStorage((state) => state.user);
@@ -53,8 +53,15 @@ function TopNavbar() {
       <header className="sticky top-0 z-20 py-3 px-4 sm:px-6 bg-[#08090D]/95 backdrop-blur-md border-b border-zinc-800/80 flex items-center justify-between gap-4">
         {/* Left Status Chips */}
         <div className="flex items-center gap-2.5">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-300 border border-indigo-500/25 shadow-sm">
-            <Shield size={12} className="text-indigo-400" />
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-300 border border-indigo-500/25 shadow-sm">
+            <img
+              src={EDNORA_LOGO_LOCAL}
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = EDNORA_LOGO_URL;
+              }}
+              alt="Ednora"
+              className="h-4 w-auto object-contain"
+            />
             <span className="hidden sm:inline">Ednora OS</span>
             <span className="sm:hidden">Ednora</span>
           </span>
@@ -159,19 +166,19 @@ function TopNavbar() {
               {[
                 {
                   title: "Node.js REST API",
-                  url: "https://ciitm-backend.onrender.com",
+                  url: "https://ednora-backend.onrender.com",
                   status: "Healthy",
                   color: "emerald",
                 },
                 {
                   title: "RabbitMQ Message Broker",
-                  url: "amqp://rabbitmq-ciitm",
+                  url: "amqp://rabbitmq-ednora",
                   status: "Online",
                   color: "emerald",
                 },
                 {
                   title: "MongoDB Cloud Atlas",
-                  url: "mongodb+srv://cluster.ciitm",
+                  url: "mongodb+srv://cluster.ednora",
                   status: "Connected",
                   color: "indigo",
                 },
