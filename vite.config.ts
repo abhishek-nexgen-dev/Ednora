@@ -30,6 +30,12 @@ export default defineConfig(async () => ({
   build: {
     chunkSizeWarningLimit: 800,
     rollupOptions: {
+      onwarn(warning, defaultHandler) {
+        if (warning.code === "INVALID_ANNOTATION") {
+          return;
+        }
+        defaultHandler(warning);
+      },
       output: {
         manualChunks: {
           vendor: ["react", "react-dom", "react-router-dom"],
