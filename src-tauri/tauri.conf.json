@@ -43,20 +43,20 @@
     "shortDescription": "Ednora — Where Knowledge Finds Its Future",
     "longDescription": "Ednora Institutional Academic & ERP Desktop Platform. Where Knowledge Finds Its Future.",
     "macOS": {
-      "minimumSystemVersion": "10.15"
-    },
-    "dmg": {
-      "windowSize": {
-        "width": 660,
-        "height": 400
-      },
-      "appPosition": {
-        "x": 180,
-        "y": 170
-      },
-      "applicationFolderPosition": {
-        "x": 480,
-        "y": 170
+      "minimumSystemVersion": "10.15",
+      "dmg": {
+        "windowSize": {
+          "width": 660,
+          "height": 400
+        },
+        "appPosition": {
+          "x": 180,
+          "y": 170
+        },
+        "applicationFolderPosition": {
+          "x": 480,
+          "y": 170
+        }
       }
     }
   }
