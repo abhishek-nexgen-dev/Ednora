@@ -68,13 +68,14 @@
 - **Course Catalog**: Filter and browse active programs across Engineering, IT, Commerce, and Sciences.
 - **Course Creation & Validation**: Robust form powered by React Hook Form and Zod schemas, supporting dynamic Admission Criteria lists, Required Documents, and duration specs.
 - **Course Banner Artwork**: Live file upload to backend with Cloudinary asset fallback.
-- **Live Edit & Deletion**: In-place modal editor ([EditCourseModal.tsx](src/features/Course/v1/components/EditCourseModal.tsx)) with real-time sync with backend endpoints (`PUT /api/v1/admin/course/:id/update`, `DELETE /api/v1/admin/course/:id/delete`).
+- **Resilient Edit & Deletion**: In-place modal editor ([EditCourseModal.tsx](src/features/Course/v1/components/EditCourseModal.tsx)) with dual-payload support (standard multipart `FormData` for banner changes and clean JSON for metadata updates), fallback endpoints (`PUT /api/v1/admin/course/:id/update`, `PUT /api/v1/admin/course/update/:id`), and optimistic Zustand store synchronization.
 
 ### 2. Faculty & Teacher Directory
 - **Faculty Records**: Directory of academic professors, lecturers, and department leads.
-- **Direct Photo Upload**: Native file selector with instant image preview, supporting both multipart `Avtar` uploads and URL links.
-- **Comprehensive Profiles**: Institutional emails, departments, specializations, teaching experience, and social media channels.
-- **Faculty Induction & Update**: Seamless creation and updating synced directly to `/api/v1/admin/teacher/create` and `/api/v1/admin/teacher/:id/update`.
+- **Direct Photo Upload**: Native file selector with instant image preview, supporting both multipart `Avtar` file uploads and direct image URL fallback.
+- **Zod Schema Validation**: Form fields strictly validated using [Teacher.Validate.ts](src/features/teacher/v1/Validations/Teacher.Validate.ts), ensuring required faculty details (name, email, department, designation, qualification, experience).
+- **Social Media Link Normalization**: Full UI inputs for Instagram, LinkedIn, Facebook, and Twitter/X with smart URI auto-completion (automatically prepending `https://` and substituting valid institutional fallback URLs when empty or `#` to guarantee backend schema compatibility).
+- **Faculty Induction & Update**: Seamless creation and updating synced directly to `/api/v1/admin/teacher/create` and `/api/v1/admin/teacher/:id/update` with immediate optimistic store updates.
 
 ### 3. Student Admissions & Enrollment
 - **Admissions Ledger**: Track pending, approved, and rejected candidate registrations.
@@ -281,6 +282,8 @@ ciitm-desktop/
 │   │   ├── settings/                # Campus contact links & portal configuration
 │   │   ├── system/                  # Health probes and RabbitMQ queue monitor
 │   │   ├── teacher/                 # Faculty directory & photo upload manager
+│   │   │   └── v1/
+│   │   │       └── Validations/     # Teacher Zod validation schemas
 │   │   └── testimonials/            # Alumni testimonial reviews
 │   ├── types/
 │   │   └── backend.types.ts         # TypeScript definitions for backend models

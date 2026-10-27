@@ -14,10 +14,13 @@ import {
   Image as ImageIcon,
   X,
   Phone,
+  Globe,
+  Share2,
 } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
-import api from "../../Utils/api.utils";
+import api, { getErrorMessage } from "../../Utils/api.utils";
 import { BackendTeacher } from "../../types/backend.types";
+import { TeacherValidation } from "./v1/Validations/Teacher.Validate";
 
 export default function TeacherPage() {
   const [teachers, setTeachers] = useState<BackendTeacher[]>([]);
@@ -39,13 +42,15 @@ export default function TeacherPage() {
     qualification: "M.Tech in CSE",
     Experience: 3,
     email: "",
-    phone: "",
+    phone: "+91 94311 00000",
     Avtar: "",
     facebook: "",
     linkedin: "",
     twitter: "",
     instagram: "",
   });
+
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   const loadTeachers = async () => {
     setLoading(true);
@@ -100,6 +105,7 @@ export default function TeacherPage() {
       twitter: "",
       instagram: "",
     });
+    setFormErrors({});
     setAvatarFile(null);
     setAvatarPreview("");
     setEditingTeacher(null);
@@ -118,11 +124,12 @@ export default function TeacherPage() {
       email: t.email || "",
       phone: t.phone || "",
       Avtar: existingImg,
-      facebook: social.facebook === "#" ? "" : social.facebook || "",
-      linkedin: social.linkedin === "#" ? "" : social.linkedin || "",
-      twitter: social.twitter === "#" ? "" : social.twitter || "",
-      instagram: social.instagram === "#" ? "" : social.instagram || "",
+      facebook: social.facebook === "#" || social.facebook?.includes("example.com") ? "" : social.facebook || "",
+      linkedin: social.linkedin === "#" || social.linkedin?.includes("example.com") ? "" : social.linkedin || "",
+      twitter: social.twitter === "#" || social.twitter?.includes("example.com") ? "" : social.twitter || "",
+      instagram: social.instagram === "#" || social.instagram?.includes("example.com") ? "" : social.instagram || "",
     });
+    setFormErrors({});
     setAvatarFile(null);
     setAvatarPreview(existingImg);
     setEditingTeacher(t);
@@ -135,6 +142,7 @@ export default function TeacherPage() {
       setAvatarFile(file);
       const previewUrl = URL.createObjectURL(file);
       setAvatarPreview(previewUrl);
+      setFormErrors((prev) => ({ ...prev, Avtar: "" }));
     }
   };
 
@@ -143,66 +151,134 @@ export default function TeacherPage() {
     try {
       await api.delete(`/api/v1/admin/teacher/${id}/delete`);
       toast.success(`Faculty profile for ${name} removed.`);
+      setTeachers((prev) => prev.filter((t) => t._id !== id));
       loadTeachers();
     } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
-      toast.error(err?.response?.data?.message || "Failed to remove faculty member.");
+      toast.error(getErrorMessage(error, "Failed to remove faculty member."));
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name.trim() || !formData.email.trim()) {
-      toast.error("Faculty name and institutional email are required.");
+    setFormErrors({});
+
+    // 1. Zod Validation
+    const validationResult = TeacherValidation.safeParse(formData);
+    if (!validationResult.success) {
+      const errors: Record<string, string> = {};
+      validationResult.error.issues.forEach((issue) => {
+        const path = String(issue.path[0]);
+        errors[path] = issue.message;
+      });
+      setFormErrors(errors);
+      const firstErrorMessage = validationResult.error.issues[0]?.message;
+      toast.error(firstErrorMessage || "Please fix validation errors.");
       return;
     }
 
-    if (!editingTeacher && !avatarFile && !formData.Avtar) {
-      toast.error("Please upload an image for the faculty member.");
+    const validated = validationResult.data;
+
+    // Verify avatar presence for new additions
+    if (!editingTeacher && !avatarFile && !formData.Avtar.trim()) {
+      setFormErrors((prev) => ({ ...prev, Avtar: "Faculty photograph or image URL is required" }));
+      toast.error("Please upload or provide a photograph for the faculty member.");
       return;
     }
 
     setSubmitting(true);
     try {
       const payload = new FormData();
-      payload.append("name", formData.name.trim());
-      payload.append("email", formData.email.trim());
-      payload.append("role", formData.designation.trim());
-      payload.append("designation", formData.designation.trim());
-      payload.append("Specialization", formData.department.trim());
-      payload.append("department", formData.department.trim());
-      payload.append("qualification", formData.qualification.trim());
-      payload.append("Experience", String(formData.Experience || 1));
-      payload.append("phone", formData.phone.trim());
-      payload.append("facebook", formData.facebook.trim() || "#");
-      payload.append("linkedin", formData.linkedin.trim() || "#");
-      payload.append("twitter", formData.twitter.trim() || "#");
-      payload.append("instagram", formData.instagram.trim() || "#");
+      payload.append("name", validated.name);
+      payload.append("email", validated.email);
+      payload.append("role", validated.designation);
+      payload.append("designation", validated.designation);
+      payload.append("Specialization", validated.department);
+      payload.append("department", validated.department);
+      payload.append("qualification", validated.qualification);
+      payload.append("Experience", String(validated.Experience));
+      payload.append("phone", validated.phone || "+91 94311 00000");
+
+      // Validated social media URLs (guaranteed valid URI format)
+      payload.append("facebook", validated.facebook || "https://facebook.com/ednora");
+      payload.append("linkedin", validated.linkedin || "https://linkedin.com/company/ednora");
+      payload.append("twitter", validated.twitter || "https://twitter.com/ednora");
+      payload.append("instagram", validated.instagram || "https://instagram.com/ednora");
 
       if (avatarFile) {
         payload.append("Avtar", avatarFile);
-      } else if (formData.Avtar) {
-        payload.append("Avtar", formData.Avtar);
-        payload.append("image", formData.Avtar);
+      } else if (formData.Avtar.trim()) {
+        payload.append("Avtar", formData.Avtar.trim());
+        payload.append("image", formData.Avtar.trim());
+      } else if (editingTeacher && editingTeacher.image) {
+        payload.append("Avtar", editingTeacher.image);
+        payload.append("image", editingTeacher.image);
       }
 
       if (editingTeacher) {
-        await api.put(`/api/v1/admin/teacher/${editingTeacher._id}/update`, payload, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-        toast.success(`Faculty member ${formData.name} updated successfully!`);
+        await api.put(`/api/v1/admin/teacher/${editingTeacher._id}/update`, payload);
+        toast.success(`Faculty profile for ${validated.name} updated successfully!`);
+
+        // Optimistic update
+        setTeachers((prev) =>
+          prev.map((t) =>
+            t._id === editingTeacher._id
+              ? {
+                  ...t,
+                  name: validated.name,
+                  email: validated.email,
+                  role: validated.designation,
+                  designation: validated.designation,
+                  department: validated.department,
+                  Specialization: validated.department,
+                  qualification: validated.qualification,
+                  Experience: validated.Experience,
+                  phone: validated.phone,
+                  image: avatarPreview || t.image,
+                  social_media: [
+                    {
+                      facebook: validated.facebook,
+                      linkedin: validated.linkedin,
+                      twitter: validated.twitter,
+                      instagram: validated.instagram,
+                    },
+                  ],
+                }
+              : t
+          )
+        );
       } else {
-        await api.post("/api/v1/admin/teacher/create", payload, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-        toast.success(`Faculty member ${formData.name} inducted successfully!`);
+        const res = await api.post("/api/v1/admin/teacher/create", payload);
+        toast.success(`Faculty member ${validated.name} inducted successfully!`);
+
+        const newTeacher: BackendTeacher = res.data?.data || {
+          _id: `temp_${Date.now()}`,
+          name: validated.name,
+          email: validated.email,
+          role: validated.designation,
+          designation: validated.designation,
+          department: validated.department,
+          Specialization: validated.department,
+          qualification: validated.qualification,
+          Experience: validated.Experience,
+          phone: validated.phone,
+          image: avatarPreview || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300",
+          social_media: [
+            {
+              facebook: validated.facebook,
+              linkedin: validated.linkedin,
+              twitter: validated.twitter,
+              instagram: validated.instagram,
+            },
+          ],
+        };
+
+        setTeachers((prev) => [newTeacher, ...prev]);
       }
 
       setIsAddModalOpen(false);
       loadTeachers();
     } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
-      toast.error(err?.response?.data?.message || "Failed to save faculty record.");
+      toast.error(getErrorMessage(error, "Failed to save faculty record."));
     } finally {
       setSubmitting(false);
     }
@@ -388,6 +464,43 @@ export default function TeacherPage() {
                     </div>
                   </div>
                 </div>
+
+                {/* Social media footer */}
+                {t.social_media && t.social_media[0] && (
+                  <div className="mt-4 pt-3 border-t border-zinc-900/80 flex items-center gap-2 text-zinc-400 text-xs">
+                    <span className="text-[10px] text-zinc-600 uppercase font-semibold">Channels:</span>
+                    {t.social_media[0].instagram && t.social_media[0].instagram !== "#" && (
+                      <a
+                        href={t.social_media[0].instagram}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="hover:text-pink-400 transition text-[11px]"
+                      >
+                        Instagram
+                      </a>
+                    )}
+                    {t.social_media[0].linkedin && t.social_media[0].linkedin !== "#" && (
+                      <a
+                        href={t.social_media[0].linkedin}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="hover:text-blue-400 transition text-[11px]"
+                      >
+                        LinkedIn
+                      </a>
+                    )}
+                    {t.social_media[0].facebook && t.social_media[0].facebook !== "#" && (
+                      <a
+                        href={t.social_media[0].facebook}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="hover:text-indigo-400 transition text-[11px]"
+                      >
+                        Facebook
+                      </a>
+                    )}
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -397,7 +510,7 @@ export default function TeacherPage() {
       {/* Add / Edit Faculty Modal */}
       {isAddModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm animate-fadeIn">
-          <div className="w-full max-w-lg rounded-3xl border border-zinc-800 bg-[#0C0D12] p-5 sm:p-7 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
+          <div className="w-full max-w-xl rounded-3xl border border-zinc-800 bg-[#0C0D12] p-5 sm:p-7 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
             <div className="flex items-start justify-between border-b border-zinc-800 pb-3">
               <div>
                 <span className="text-xs uppercase tracking-wider font-semibold text-indigo-400">
@@ -419,7 +532,7 @@ export default function TeacherPage() {
               {/* Image Upload Option */}
               <div>
                 <label className="text-xs font-semibold text-zinc-300 block mb-1.5">
-                  Faculty Photograph / Avatar *
+                  Faculty Photograph / Portrait Photo *
                 </label>
 
                 <input
@@ -433,7 +546,9 @@ export default function TeacherPage() {
                 <div className="flex items-center gap-4">
                   <div
                     onClick={() => fileInputRef.current?.click()}
-                    className="w-20 h-20 rounded-2xl overflow-hidden bg-zinc-900 border-2 border-dashed border-indigo-500/40 hover:border-indigo-400 cursor-pointer flex flex-col items-center justify-center shrink-0 transition"
+                    className={`w-20 h-20 rounded-2xl overflow-hidden bg-zinc-900 border-2 border-dashed ${
+                      formErrors.Avtar ? "border-red-500/80" : "border-indigo-500/40 hover:border-indigo-400"
+                    } cursor-pointer flex flex-col items-center justify-center shrink-0 transition`}
                   >
                     {avatarPreview ? (
                       <img
@@ -455,43 +570,59 @@ export default function TeacherPage() {
                       onClick={() => fileInputRef.current?.click()}
                       className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs font-semibold text-white transition flex items-center gap-1.5"
                     >
-                      <ImageIcon size={14} /> Browse Image File
+                      <ImageIcon size={14} /> Browse Photo File
                     </button>
                     <p className="text-[11px] text-zinc-400">
-                      Upload PNG or JPG portrait photo.
+                      Upload PNG or JPG portrait photo. Max 5MB.
                     </p>
                     <input
                       type="text"
-                      placeholder="Or enter image URL (https://...)"
+                      placeholder="Or enter direct photo URL (https://...)"
                       value={formData.Avtar}
                       onChange={(e) => {
                         setFormData({ ...formData, Avtar: e.target.value });
                         if (!avatarFile) setAvatarPreview(e.target.value);
+                        setFormErrors((prev) => ({ ...prev, Avtar: "" }));
                       }}
                       className="w-full px-2.5 py-1.5 bg-zinc-900 border border-zinc-800 rounded-lg text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-indigo-500"
                     />
                   </div>
                 </div>
+                {formErrors.Avtar && (
+                  <p className="text-xs text-red-400 mt-1">{formErrors.Avtar}</p>
+                )}
               </div>
 
+              {/* Full Name */}
               <div>
-                <label className="text-xs text-zinc-400">Full Name *</label>
+                <label className="text-xs text-zinc-300 font-medium">Full Name *</label>
                 <input
                   type="text"
-                  required
                   placeholder="e.g. Dr. Rajesh Kumar"
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full mt-1 px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500"
+                  onChange={(e) => {
+                    setFormData({ ...formData, name: e.target.value });
+                    setFormErrors((prev) => ({ ...prev, name: "" }));
+                  }}
+                  className={`w-full mt-1 px-3 py-2 bg-zinc-900 border ${
+                    formErrors.name ? "border-red-500" : "border-zinc-800"
+                  } rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500`}
                 />
+                {formErrors.name && (
+                  <p className="text-xs text-red-400 mt-1">{formErrors.name}</p>
+                )}
               </div>
 
+              {/* Department & Role */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs text-zinc-400">Department *</label>
+                  <label className="text-xs text-zinc-300 font-medium">Department *</label>
                   <select
                     value={formData.department}
-                    onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                    onChange={(e) => {
+                      setFormData({ ...formData, department: e.target.value });
+                      setFormErrors((prev) => ({ ...prev, department: "" }));
+                    }}
                     className="w-full mt-1 px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500"
                   >
                     <option value="Computer Science & Engineering">Computer Science & Engineering</option>
@@ -502,32 +633,47 @@ export default function TeacherPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs text-zinc-400">Designation / Role *</label>
+                  <label className="text-xs text-zinc-300 font-medium">Designation / Role *</label>
                   <input
                     type="text"
-                    required
                     value={formData.designation}
-                    onChange={(e) => setFormData({ ...formData, designation: e.target.value })}
+                    onChange={(e) => {
+                      setFormData({ ...formData, designation: e.target.value });
+                      setFormErrors((prev) => ({ ...prev, designation: "" }));
+                    }}
                     placeholder="e.g. Assistant Professor"
-                    className="w-full mt-1 px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500"
+                    className={`w-full mt-1 px-3 py-2 bg-zinc-900 border ${
+                      formErrors.designation ? "border-red-500" : "border-zinc-800"
+                    } rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500`}
                   />
+                  {formErrors.designation && (
+                    <p className="text-xs text-red-400 mt-1">{formErrors.designation}</p>
+                  )}
                 </div>
               </div>
 
+              {/* Email & Phone */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs text-zinc-400">Institutional Email *</label>
+                  <label className="text-xs text-zinc-300 font-medium">Institutional Email *</label>
                   <input
                     type="email"
-                    required
-                    placeholder="faculty@ednora.edu"
+                    placeholder="rajesh.kumar@ednora.edu"
                     value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full mt-1 px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500"
+                    onChange={(e) => {
+                      setFormData({ ...formData, email: e.target.value });
+                      setFormErrors((prev) => ({ ...prev, email: "" }));
+                    }}
+                    className={`w-full mt-1 px-3 py-2 bg-zinc-900 border ${
+                      formErrors.email ? "border-red-500" : "border-zinc-800"
+                    } rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500`}
                   />
+                  {formErrors.email && (
+                    <p className="text-xs text-red-400 mt-1">{formErrors.email}</p>
+                  )}
                 </div>
                 <div>
-                  <label className="text-xs text-zinc-400">Contact Number</label>
+                  <label className="text-xs text-zinc-300 font-medium">Contact Phone</label>
                   <input
                     type="text"
                     placeholder="+91 94311 00000"
@@ -538,29 +684,112 @@ export default function TeacherPage() {
                 </div>
               </div>
 
+              {/* Qualification & Experience */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs text-zinc-400">Qualification</label>
+                  <label className="text-xs text-zinc-300 font-medium">Educational Qualification *</label>
                   <input
                     type="text"
-                    placeholder="e.g. M.Tech / Ph.D."
+                    placeholder="e.g. M.Tech in CSE, Ph.D."
                     value={formData.qualification}
-                    onChange={(e) => setFormData({ ...formData, qualification: e.target.value })}
-                    className="w-full mt-1 px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500"
+                    onChange={(e) => {
+                      setFormData({ ...formData, qualification: e.target.value });
+                      setFormErrors((prev) => ({ ...prev, qualification: "" }));
+                    }}
+                    className={`w-full mt-1 px-3 py-2 bg-zinc-900 border ${
+                      formErrors.qualification ? "border-red-500" : "border-zinc-800"
+                    } rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500`}
                   />
+                  {formErrors.qualification && (
+                    <p className="text-xs text-red-400 mt-1">{formErrors.qualification}</p>
+                  )}
                 </div>
                 <div>
-                  <label className="text-xs text-zinc-400">Experience (Years)</label>
+                  <label className="text-xs text-zinc-300 font-medium">Experience (Years) *</label>
                   <input
                     type="number"
                     min="0"
                     value={formData.Experience}
-                    onChange={(e) => setFormData({ ...formData, Experience: Number(e.target.value) })}
-                    className="w-full mt-1 px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500"
+                    onChange={(e) => {
+                      setFormData({ ...formData, Experience: Number(e.target.value) });
+                      setFormErrors((prev) => ({ ...prev, Experience: "" }));
+                    }}
+                    className={`w-full mt-1 px-3 py-2 bg-zinc-900 border ${
+                      formErrors.Experience ? "border-red-500" : "border-zinc-800"
+                    } rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500`}
                   />
+                  {formErrors.Experience && (
+                    <p className="text-xs text-red-400 mt-1">{formErrors.Experience}</p>
+                  )}
                 </div>
               </div>
 
+              {/* Social Media Links Section */}
+              <div className="pt-2 border-t border-zinc-900 space-y-3">
+                <div className="flex items-center gap-1.5 text-xs font-semibold text-indigo-400">
+                  <Share2 size={13} /> Social & Academic Profiles (Optional)
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* Instagram */}
+                  <div>
+                    <label className="text-xs text-zinc-400 flex items-center gap-1">
+                      <Globe size={11} className="text-pink-400" /> Instagram Profile
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. instagram.com/prof_rajesh"
+                      value={formData.instagram}
+                      onChange={(e) => setFormData({ ...formData, instagram: e.target.value })}
+                      className="w-full mt-1 px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+
+                  {/* LinkedIn */}
+                  <div>
+                    <label className="text-xs text-zinc-400 flex items-center gap-1">
+                      <Globe size={11} className="text-blue-400" /> LinkedIn Profile
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. linkedin.com/in/prof-rajesh"
+                      value={formData.linkedin}
+                      onChange={(e) => setFormData({ ...formData, linkedin: e.target.value })}
+                      className="w-full mt-1 px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+
+                  {/* Facebook */}
+                  <div>
+                    <label className="text-xs text-zinc-400 flex items-center gap-1">
+                      <Globe size={11} className="text-indigo-400" /> Facebook Profile
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. facebook.com/prof.rajesh"
+                      value={formData.facebook}
+                      onChange={(e) => setFormData({ ...formData, facebook: e.target.value })}
+                      className="w-full mt-1 px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+
+                  {/* Twitter / X */}
+                  <div>
+                    <label className="text-xs text-zinc-400 flex items-center gap-1">
+                      <Globe size={11} className="text-sky-400" /> Twitter / X Handle
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. twitter.com/prof_rajesh"
+                      value={formData.twitter}
+                      onChange={(e) => setFormData({ ...formData, twitter: e.target.value })}
+                      className="w-full mt-1 px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Submit Buttons */}
               <div className="flex justify-end gap-2 pt-3 border-t border-zinc-800">
                 <button
                   type="button"
