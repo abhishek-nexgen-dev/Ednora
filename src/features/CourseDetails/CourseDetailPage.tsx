@@ -3,37 +3,43 @@ import AdmissionCriteria from "./v1/Components/AdmissionCriteria";
 import CourseHero from "./v1/Components/CourseHero";
 import CourseSidebar from "./v1/Components/CourseSidebar";
 import ProgramDescription from "./v1/Components/ProgramDescription";
-import useCourseStore from "../Course/v1/store/course.store";
+import useCourseStore, { Course } from "../Course/v1/store/course.store";
 import api from "../../Utils/api.utils";
 import { BackendCourse } from "../../types/backend.types";
 import { Link, useSearchParams } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Edit } from "lucide-react";
+import { EditCourseModal } from "../Course/v1/components/EditCourseModal";
 
 export default function CourseDetailsPage() {
   const [searchParams] = useSearchParams();
   const requestedId = searchParams.get("id");
 
   const storeCourses = useCourseStore((state) => state.course);
-  const [courses, setCourses] = useState(storeCourses);
+  const [courses, setCourses] = useState<Course[]>(storeCourses);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [isEditing, setIsEditing] = useState(false);
+
+  const fetchCourses = () => {
+    api
+      .get("/api/v1/user/findAllCourse")
+      .then((res) => {
+        if (res.data?.data && Array.isArray(res.data.data)) {
+          setCourses(res.data.data);
+          useCourseStore.getState().setCourse(res.data.data);
+          if (requestedId) {
+            const idx = res.data.data.findIndex(
+              (c: BackendCourse) => c._id === requestedId || c.courseCode === requestedId,
+            );
+            if (idx !== -1) setSelectedIndex(idx);
+          }
+        }
+      })
+      .catch(console.warn);
+  };
 
   useEffect(() => {
     if (storeCourses.length === 0) {
-      api
-        .get("/api/v1/user/findAllCourse")
-        .then((res) => {
-          if (res.data?.data && Array.isArray(res.data.data)) {
-            setCourses(res.data.data);
-            useCourseStore.getState().setCourse(res.data.data);
-            if (requestedId) {
-              const idx = res.data.data.findIndex(
-                (c: BackendCourse) => c._id === requestedId || c.courseCode === requestedId,
-              );
-              if (idx !== -1) setSelectedIndex(idx);
-            }
-          }
-        })
-        .catch(console.warn);
+      fetchCourses();
     } else {
       setCourses(storeCourses);
       if (requestedId) {
@@ -49,7 +55,7 @@ export default function CourseDetailsPage() {
     courses[0] || {
       courseName: "Bachelor of Computer Applications (BCA)",
       courseCode: "BCA-101",
-      Department: "Computer Science & Information Technology",
+      Department: "Computer Science",
       courseDuration: "3 Years",
       duration: "3 Years",
       mode: "Regular (Full Time)",
@@ -79,28 +85,37 @@ export default function CourseDetailsPage() {
             </div>
           </div>
 
-          {courses.length > 1 && (
-            <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
-              {courses.map((c, i) => (
-                <button
-                  key={c._id || c.courseCode || i}
-                  onClick={() => setSelectedIndex(i)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition ${
-                    selectedIndex === i
-                      ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/20"
-                      : "bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white"
-                  }`}
-                >
-                  {c.courseCode || c.courseName?.slice(0, 15)}
-                </button>
-              ))}
-            </div>
-          )}
+          <div className="flex items-center gap-3">
+            {courses.length > 1 && (
+              <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
+                {courses.map((c, i) => (
+                  <button
+                    key={c._id || c.courseCode || i}
+                    onClick={() => setSelectedIndex(i)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition ${
+                      selectedIndex === i
+                        ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/20"
+                        : "bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white"
+                    }`}
+                  >
+                    {c.courseCode || c.courseName?.slice(0, 15)}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <button
+              onClick={() => setIsEditing(true)}
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white shadow-md shadow-indigo-600/20 transition shrink-0"
+            >
+              <Edit size={14} /> Edit Course
+            </button>
+          </div>
         </div>
 
         <CourseHero
           title={activeCourse.courseName}
-          department={activeCourse.Department || "Computer Science & IT"}
+          department={activeCourse.Department || "Computer Science"}
           image={
             activeCourse.courseThumbnail ||
             activeCourse.image ||
@@ -113,8 +128,13 @@ export default function CourseDetailsPage() {
         <div className="grid gap-6 lg:grid-cols-12">
           {/* Left Column */}
           <div className="space-y-6 lg:col-span-8">
-            <ProgramDescription />
-            <AdmissionCriteria />
+            <ProgramDescription
+              description={activeCourse.courseDescription || activeCourse.description}
+            />
+            <AdmissionCriteria
+              criteria={activeCourse.AdmissionCriteria}
+              eligibility={activeCourse.courseEligibility || activeCourse.eligibility}
+            />
           </div>
 
           {/* Right Column */}
@@ -123,6 +143,14 @@ export default function CourseDetailsPage() {
           </div>
         </div>
       </div>
+
+      {isEditing && (
+        <EditCourseModal
+          course={activeCourse}
+          onClose={() => setIsEditing(false)}
+          onUpdated={fetchCourses}
+        />
+      )}
     </div>
   );
 }

@@ -37,7 +37,7 @@ export function CourseBannerUpload({ onImageChange }: CourseBannerUploadProps) {
         onChange={(e) => {
           if (e.target.files && e.target.files.length > 0) {
             setCourseImage(e.target.files[0]);
-            setValue("courseImage", e.target.files[0]);
+            setValue("courseImage", e.target.files[0], { shouldValidate: true });
             onImageChange?.(e.target.files[0]);
           }
         }}
@@ -70,8 +70,8 @@ export function CourseBannerUpload({ onImageChange }: CourseBannerUploadProps) {
                   errors.courseImage?.message ? "text-red-400" : "text-zinc-500",
                 )}
               >
-                {errors.courseImage
-                  ? errors.courseImage.message
+                {errors.courseImage?.message
+                  ? String(errors.courseImage.message)
                   : "Click to select banner. Recommended: 1200x600px. Max size: 5MB."}
               </p>
             </>

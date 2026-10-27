@@ -25,6 +25,7 @@ interface CourseStore {
   course: Course[];
   setCourse: (course: Course[]) => void;
   addCourse: (course: Course) => void;
+  updateCourseInStore: (course: Course) => void;
   removeCourse: (id: string) => void;
 }
 
@@ -40,6 +41,16 @@ const useCourseStore = create<CourseStore>((set) => ({
   addCourse: (newCourse) => {
     set((state) => ({
       course: [newCourse, ...state.course],
+    }));
+  },
+
+  updateCourseInStore: (updatedCourse) => {
+    set((state) => ({
+      course: state.course.map((c) =>
+        (c._id && c._id === updatedCourse._id) || c.courseCode === updatedCourse.courseCode
+          ? { ...c, ...updatedCourse }
+          : c
+      ),
     }));
   },
 

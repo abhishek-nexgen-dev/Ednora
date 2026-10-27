@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=Ednora
+GenericName=Academic Management Platform
+Comment=Ednora Institutional Academic & ERP Desktop Platform
+Exec=ednora
+Icon=com.ednora.desktop
+Terminal=false
+Categories=Education;
+Keywords=Education;College;University;ERP;Academics;Courses;Faculty;Students;
+StartupNotify=true
+StartupWMClass=ednora
+

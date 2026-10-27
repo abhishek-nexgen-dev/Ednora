@@ -10,6 +10,7 @@ import { CourseSchema } from "../Validations/CreateCourse.Validate";
 import { RequiredDocuments } from "./RequiredDocuments";
 import useCreateCourse from "../hooks/useCreateCourse";
 import { useNavigate } from "react-router-dom";
+import { FieldErrors } from "react-hook-form";
 
 const CourseForm = () => {
   const { handleSubmit } = useCourseFormContext();
@@ -19,26 +20,37 @@ const CourseForm = () => {
   const onSubmit = async (data: CourseSchema) => {
     try {
       const formData = new FormData();
-      formData.append("courseName", data.courseName);
-      formData.append("courseCode", data.courseCode);
-      formData.append("mode", data.mode);
-      formData.append("seats", String(data.seats));
-      formData.append("courseDescription", data.courseDescription);
-      formData.append("courseDuration", data.courseDuration);
-      formData.append("courseEligibility", data.courseEligibility);
-      formData.append("coursePrice", String(data.coursePrice));
-      formData.append("Department", data.Department);
+      formData.append("courseName", data.courseName.trim());
+      formData.append("courseCode", data.courseCode.trim());
+      formData.append("mode", data.mode || "Hybrid");
+      formData.append("seats", String(data.seats || 60));
+      formData.append("courseDescription", data.courseDescription.trim());
+      formData.append("courseDuration", data.courseDuration.trim() || "3 Years");
+      formData.append("courseEligibility", data.courseEligibility.trim() || "10+2 or Equivalent");
+      formData.append("coursePrice", String(data.coursePrice || 0));
+      formData.append("Department", data.Department.trim() || "Computer Science");
 
-      if (data.courseImage) {
+      if (data.courseImage instanceof File) {
+        formData.append("courseThumbnail", data.courseImage);
         formData.append("image", data.courseImage);
+      } else if (typeof data.courseImage === "string" && data.courseImage) {
+        formData.append("courseThumbnail", data.courseImage);
       }
-      if (data.AdmissionCriteria) {
-        data.AdmissionCriteria.forEach((crit) => {
+
+      const validCriteria = (data.AdmissionCriteria || [])
+        .map((c) => (typeof c === "string" ? c.trim() : ""))
+        .filter(Boolean);
+
+      if (validCriteria.length > 0) {
+        validCriteria.forEach((crit) => {
           formData.append("AdmissionCriteria", crit);
         });
+      } else {
+        formData.append("AdmissionCriteria", "10+2 with minimum 50% aggregate marks");
       }
-      if (data.RequiredDocuments) {
-        data.RequiredDocuments.forEach((doc) => {
+
+      if (data.RequiredDocuments && data.RequiredDocuments.length > 0) {
+        data.RequiredDocuments.filter(Boolean).forEach((doc) => {
           formData.append("RequiredDocuments", doc);
         });
       }
@@ -52,8 +64,13 @@ const CourseForm = () => {
     }
   };
 
-  const onError = () => {
-    toast.error("Please fix the validation errors before submitting.");
+  const onError = (errors: FieldErrors) => {
+    const firstErrorMessage = Object.values(errors)[0]?.message;
+    if (firstErrorMessage && typeof firstErrorMessage === "string") {
+      toast.error(firstErrorMessage);
+    } else {
+      toast.error("Please fill in all required course fields before submitting.");
+    }
   };
 
   return (

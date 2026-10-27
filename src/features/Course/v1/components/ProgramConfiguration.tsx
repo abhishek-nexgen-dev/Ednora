@@ -63,14 +63,12 @@ export function ProgramConfiguration() {
               options={[
                 "Computer Science",
                 "Information Technology",
-                "Electronics and Communication",
-                "Mechanical Engineering",
-                "Civil Engineering",
-                "Electrical Engineering",
-                "Chemical Engineering",
-                "Business Administration",
+                "Engineering",
+                "Management",
                 "Commerce",
+                "Science",
                 "Arts",
+                "Business",
               ]}
               onSelect={field.onChange}
             />
@@ -88,6 +86,40 @@ export function ProgramConfiguration() {
               error={errors.mode?.message}
               options={["Offline", "Online", "Hybrid"]}
               onSelect={field.onChange}
+            />
+          )}
+        />
+
+        {/* Course Duration */}
+        <Controller
+          name="courseDuration"
+          control={control}
+          render={({ field }) => (
+            <Input
+              label="Duration"
+              name={field.name}
+              placeholder="e.g. 3 Years (6 Semesters)"
+              value={field.value ?? ""}
+              readonly={false}
+              error={errors.courseDuration?.message}
+              onChange={(_, value) => field.onChange(value)}
+            />
+          )}
+        />
+
+        {/* Course Eligibility */}
+        <Controller
+          name="courseEligibility"
+          control={control}
+          render={({ field }) => (
+            <Input
+              label="Eligibility Criteria"
+              name={field.name}
+              placeholder="e.g. 10+2 with 50% aggregate marks"
+              value={field.value ?? ""}
+              readonly={false}
+              error={errors.courseEligibility?.message}
+              onChange={(_, value) => field.onChange(value)}
             />
           )}
         />
@@ -119,8 +151,8 @@ export function ProgramConfiguration() {
               type="number"
               label="Total Seats"
               name={field.name}
-              placeholder="120"
-              value={field.value !== undefined ? Number(field.value) : ""}
+              placeholder="60"
+              value={field.value !== undefined ? Number(field.value) : 60}
               readonly={false}
               error={errors.seats?.message}
               onChange={(_, value) => field.onChange(value)}

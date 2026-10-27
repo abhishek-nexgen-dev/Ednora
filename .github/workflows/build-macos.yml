@@ -1,0 +1,127 @@
+name: Build macOS (Ednora DMG)
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'macOS Target Architecture'
+        required: false
+        default: 'universal'
+        type: choice
+        options:
+          - 'universal'
+          - 'aarch64-apple-darwin'
+          - 'x86_64-apple-darwin'
+          - 'native'
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+jobs:
+  build-macos:
+    name: Build macOS DMG (${{ inputs.target || 'universal' }})
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup Rust Stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin, x86_64-apple-darwin
+
+      - name: Rust Cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+
+      - name: Install Frontend Dependencies
+        run: |
+          echo "==> Installing Node.js dependencies..."
+          if [ -f package-lock.json ]; then
+            echo "package-lock.json detected, running npm ci..."
+            npm ci
+          else
+            echo "package-lock.json not found, running npm install..."
+            npm install
+          fi
+
+      - name: Determine Target Build Flags
+        id: flags
+        run: |
+          TARGET="${{ inputs.target || 'universal' }}"
+          echo "Configured architecture target: $TARGET"
+          if [ "$TARGET" = "universal" ]; then
+            echo "build_args=--target universal-apple-darwin --bundles dmg,app" >> "$GITHUB_OUTPUT"
+          elif [ "$TARGET" = "aarch64-apple-darwin" ]; then
+            echo "build_args=--target aarch64-apple-darwin --bundles dmg,app" >> "$GITHUB_OUTPUT"
+          elif [ "$TARGET" = "x86_64-apple-darwin" ]; then
+            echo "build_args=--target x86_64-apple-darwin --bundles dmg,app" >> "$GITHUB_OUTPUT"
+          else
+            echo "build_args=--bundles dmg,app" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build Desktop Application (Tauri 2)
+        run: |
+          echo "==> Building Ednora Desktop with flags: ${{ steps.flags.outputs.build_args }}"
+          npm run tauri:build -- ${{ steps.flags.outputs.build_args }}
+
+      - name: Prepare Artifacts & Archive .app Bundle
+        run: |
+          echo "==> Locating build outputs..."
+          mkdir -p dist-artifacts
+
+          # Copy generated .dmg files
+          DMG_FILES=$(find src-tauri/target -name "*.dmg" -type f)
+          if [ -n "$DMG_FILES" ]; then
+            for dmg in $DMG_FILES; do
+              echo "Found DMG: $dmg"
+              cp "$dmg" dist-artifacts/
+            done
+          fi
+
+          # Archive .app bundle using ditto to preserve macOS permissions & resource forks
+          APP_DIR=$(find src-tauri/target -name "Ednora.app" -type d | head -n 1)
+          if [ -n "$APP_DIR" ]; then
+            echo "Found .app bundle at $APP_DIR. Archiving into zip..."
+            PARENT_DIR=$(dirname "$APP_DIR")
+            (cd "$PARENT_DIR" && ditto -c -k --sequesterRsrc --keepParent "Ednora.app" "Ednora-macOS.app.zip")
+            cp "$PARENT_DIR/Ednora-macOS.app.zip" dist-artifacts/
+          fi
+
+      - name: Verify Build Deliverables
+        run: |
+          echo "==> Verifying final artifacts in dist-artifacts:"
+          ls -lh dist-artifacts
+          DMG_COUNT=$(find dist-artifacts -name "*.dmg" | wc -l)
+          if [ "$DMG_COUNT" -eq 0 ]; then
+            echo "::error::Build verification failed: No .dmg file found in dist-artifacts!"
+            exit 1
+          fi
+          echo "==> Verification successful! $DMG_COUNT DMG installer(s) ready."
+
+      - name: Upload macOS DMG Installer Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Ednora-macOS-DMG-${{ inputs.target || 'universal' }}
+          path: dist-artifacts/*.dmg
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload macOS App Bundle Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Ednora-macOS-AppBundle-${{ inputs.target || 'universal' }}
+          path: dist-artifacts/*.zip
+          if-no-files-found: warn
+          retention-days: 14
+

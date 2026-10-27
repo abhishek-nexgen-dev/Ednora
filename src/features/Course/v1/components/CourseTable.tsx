@@ -1,18 +1,22 @@
 import React, { useState } from "react";
 import CoursePagination from "./CoursePagination";
 import CourseTableRow from "./CourseTableRow";
-import useCourseStore from "../store/course.store";
-import { FaEye, FaTrash } from "react-icons/fa";
+import useCourseStore, { Course } from "../store/course.store";
+import { FaEye, FaTrash, FaEdit } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import api from "../../../../Utils/api.utils";
+import { EditCourseModal } from "./EditCourseModal";
 
 const entriesPerPage = 10;
 
 const CourseTable: React.FC = () => {
   const course = useCourseStore((state) => state.course);
+  const setCourse = useCourseStore((state) => state.setCourse);
   const removeCourse = useCourseStore((state) => state.removeCourse);
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
+  const [editingCourse, setEditingCourse] = useState<Course | null>(null);
 
   const totalEntries = course.length;
   const totalPages = Math.max(1, Math.ceil(totalEntries / entriesPerPage));
@@ -23,11 +27,32 @@ const CourseTable: React.FC = () => {
     }
   };
 
-  const handleDelete = (id: string, name: string) => {
-    if (window.confirm(`Are you sure you want to delete course ${name}?`)) {
-      removeCourse(id);
-      toast.success(`Course ${name} deleted.`);
+  const refreshCourses = async () => {
+    try {
+      const res = await api.get("/api/v1/user/findAllCourse");
+      if (res.data?.data) {
+        setCourse(res.data.data);
+      }
+    } catch (err) {
+      console.warn("Failed to refresh courses:", err);
     }
+  };
+
+  const handleDelete = async (id: string, name: string) => {
+    if (!window.confirm(`Are you sure you want to delete course ${name}?`)) return;
+
+    try {
+      await api.delete(`/api/v1/admin/course/${id}/delete`);
+      removeCourse(id);
+      toast.success(`Course "${name}" deleted successfully.`);
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      toast.error(err?.response?.data?.message || "Failed to delete course.");
+    }
+  };
+
+  const handleEdit = (c: Course) => {
+    setEditingCourse(c);
   };
 
   return (
@@ -36,7 +61,7 @@ const CourseTable: React.FC = () => {
       <div className="md:hidden divide-y divide-zinc-800/80">
         {course.length > 0 ? (
           course.map((c) => (
-            <div key={c.courseCode} className="p-4 space-y-3">
+            <div key={c._id || c.courseCode} className="p-4 space-y-3">
               <div className="flex items-start justify-between gap-2">
                 <div>
                   <span className="font-mono text-xs font-semibold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
@@ -65,10 +90,17 @@ const CourseTable: React.FC = () => {
 
               <div className="flex items-center justify-end gap-2 pt-1">
                 <button
-                  onClick={() => navigate("/course-view")}
+                  onClick={() => navigate(`/course-view?id=${c._id || c.courseCode}`)}
                   className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-900 border border-zinc-800 text-xs font-medium text-zinc-300 hover:text-white"
                 >
-                  <FaEye size={12} /> View Syllabus
+                  <FaEye size={12} /> View
+                </button>
+                <button
+                  onClick={() => handleEdit(c)}
+                  className="p-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-amber-400"
+                  title="Edit"
+                >
+                  <FaEdit size={12} />
                 </button>
                 <button
                   onClick={() => handleDelete(c._id || c.courseCode, c.courseName)}
@@ -99,7 +131,13 @@ const CourseTable: React.FC = () => {
           </thead>
           <tbody className="divide-y divide-zinc-900">
             {course.length > 0 ? (
-              course.map((c) => <CourseTableRow key={c.courseCode} course={c} />)
+              course.map((c) => (
+                <CourseTableRow
+                  key={c._id || c.courseCode}
+                  course={c}
+                  onEdit={handleEdit}
+                />
+              ))
             ) : (
               <tr>
                 <td colSpan={5} className="py-12 text-center text-zinc-500">
@@ -118,6 +156,15 @@ const CourseTable: React.FC = () => {
           totalEntries={totalEntries}
           totalPages={totalPages}
           onPageChange={handlePageChange}
+        />
+      )}
+
+      {/* Edit Course Modal */}
+      {editingCourse && (
+        <EditCourseModal
+          course={editingCourse}
+          onClose={() => setEditingCourse(null)}
+          onUpdated={refreshCourses}
         />
       )}
     </div>
