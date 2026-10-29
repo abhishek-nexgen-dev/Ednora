@@ -17,40 +17,7 @@ import { toast, ToastContainer } from "react-toastify";
 import api, { getErrorMessage } from "../../Utils/api.utils";
 import { BackendContactInquiry } from "../../types/backend.types";
 
-const FALLBACK_INQUIRIES: BackendContactInquiry[] = [
-  {
-    _id: "inq_6701a89f2301",
-    cName: "Aarav Sharma",
-    cEmail: "aarav.sharma@gmail.com",
-    cNumber: 9876543210,
-    cMessage: "Inquiry regarding Bachelor of Computer Applications (BCA) lateral entry eligibility, semester fee schedule, and scholarship cutoffs.",
-    createdAt: new Date().toISOString(),
-  },
-  {
-    _id: "inq_6701a89f2302",
-    cName: "Priya Mukherjee",
-    cEmail: "priya.m@outlook.com",
-    cNumber: 9812345678,
-    cMessage: "Requesting details regarding on-campus girls hostel accommodations, laboratory infrastructure, and 2026 admissions counseling dates.",
-    createdAt: new Date(Date.now() - 86400000).toISOString(),
-  },
-  {
-    _id: "inq_6701a89f2303",
-    cName: "Rahul Verma",
-    cEmail: "r.verma2026@gmail.com",
-    cNumber: 9765432109,
-    cMessage: "Interested in the Data Science & Artificial Intelligence certification. Are weekend batches available for working professionals?",
-    createdAt: new Date(Date.now() - 172800000).toISOString(),
-  },
-  {
-    _id: "inq_6701a89f2304",
-    cName: "Sneha Gupta",
-    cEmail: "sneha.gupta@yahoo.com",
-    cNumber: 9934567890,
-    cMessage: "Can you provide the syllabus breakdown for the Cyber Security accreditation program? Also, does the institute provide placement support?",
-    createdAt: new Date(Date.now() - 259200000).toISOString(),
-  },
-];
+const FALLBACK_INQUIRIES: BackendContactInquiry[] = [];
 
 export default function InquiriesPage() {
   const [inquiries, setInquiries] = useState<BackendContactInquiry[]>(FALLBACK_INQUIRIES);

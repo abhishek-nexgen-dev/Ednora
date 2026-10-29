@@ -27,16 +27,7 @@ interface AdminRecord {
   createdAt?: string | Date;
 }
 
-const DEFAULT_ADMINS: AdminRecord[] = [
-  {
-    _id: "root-admin",
-    name: "Prof. R. K. Sharma",
-    email: "admin@gmail.com",
-    role: "admin",
-    isActive: true,
-    createdAt: "2025-01-01T00:00:00.000Z",
-  },
-];
+const DEFAULT_ADMINS: AdminRecord[] = [];
 
 export default function AdminPage() {
   const currentUser = useAuthStorage((state) => state.user);
@@ -501,3 +492,4 @@ export default function AdminPage() {
     </div>
   );
 }
+
