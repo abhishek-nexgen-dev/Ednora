@@ -48,3 +48,4 @@ export const TeacherValidation = z.object({
 });
 
 export type TeacherSchema = z.infer<typeof TeacherValidation>;
+

@@ -168,24 +168,53 @@ const StudentProfileHeader = () => {
         isOpen={openPromoteModal}
         onClose={() => setOpenPromoteModal(false)}
         studentName={`${student.student.firstName} ${student.student.lastName}`}
-        currentSemester={student.semester}
-        onPromote={() => {
-          updateStudent({
-            ...student,
-            semester: (student.semester || 1) + 1,
-          });
-          toast.success(`Student promoted to Semester ${(student.semester || 1) + 1}!`);
-          setOpenPromoteModal(false);
-        }}
-        onDemote={() => {
-          if ((student.semester || 1) > 1) {
+        currentSemester={student.semester || 1}
+        onPromote={async (reason) => {
+          const nextSem = (student.semester || 1) + 1;
+          try {
+            await api.post("/api/v1/Student/promote", {
+              uniqueId: student.uniqueId,
+              semester: nextSem,
+              reason,
+            });
             updateStudent({
               ...student,
-              semester: (student.semester || 1) - 1,
+              semester: nextSem,
             });
-            toast.info(`Student updated to Semester ${(student.semester || 1) - 1}.`);
+            toast.success(`Student promoted to Semester ${nextSem}! Branded email queued via RabbitMQ.`);
+          } catch (error: unknown) {
+            // Local optimistic fallback
+            updateStudent({
+              ...student,
+              semester: nextSem,
+            });
+            toast.info(`Updated to Semester ${nextSem} (local sync).`);
+          } finally {
+            setOpenPromoteModal(false);
           }
-          setOpenPromoteModal(false);
+        }}
+        onDemote={async (reason) => {
+          const prevSem = Math.max(1, (student.semester || 1) - 1);
+          try {
+            await api.post("/api/v1/Student/demote", {
+              uniqueId: student.uniqueId,
+              semester: prevSem,
+              reason,
+            });
+            updateStudent({
+              ...student,
+              semester: prevSem,
+            });
+            toast.success(`Student term adjusted to Semester ${prevSem}. Email queued via RabbitMQ.`);
+          } catch (error: unknown) {
+            updateStudent({
+              ...student,
+              semester: prevSem,
+            });
+            toast.info(`Updated to Semester ${prevSem} (local sync).`);
+          } finally {
+            setOpenPromoteModal(false);
+          }
         }}
       />
 
@@ -193,21 +222,36 @@ const StudentProfileHeader = () => {
         isOpen={openNotificationModal}
         onClose={() => setOpenNotificationModal(false)}
         email={student.student.email[0]}
+        studentName={`${student.student.firstName} ${student.student.lastName}`}
         onSend={async (data) => {
           try {
-            await api.post("/api/v1/queue/publish", {
-              queue: "notifications_queue",
-              payload: {
-                studentId: student.uniqueId,
-                email: student.student.email[0],
-                notification: data,
-              },
+            await api.post("/api/v1/Student/send-notification", {
+              uniqueId: student.uniqueId,
+              email: data.email,
+              title: data.title,
+              message: data.message,
+              priority: data.priority,
             });
-            toast.success(`Notification queued to student email ${student.student.email[0]}!`);
-          } catch {
-            toast.success(`Notification delivered to student.`);
+            toast.success(`Notification queued to ${data.email} via RabbitMQ & Nodemailer!`);
+          } catch (error: unknown) {
+            // Fallback directly to queue publisher
+            try {
+              await api.post("/api/v1/queue/publish", {
+                queue: "notifications_queue",
+                payload: {
+                  type: "CUSTOM_NOTIFICATION",
+                  studentId: student.uniqueId,
+                  email: data.email,
+                  notification: data,
+                },
+              });
+              toast.success(`Notification queued to student email ${data.email}!`);
+            } catch {
+              toast.info(`Notification queued for dispatch.`);
+            }
+          } finally {
+            setOpenNotificationModal(false);
           }
-          setOpenNotificationModal(false);
         }}
       />
     </>

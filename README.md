@@ -85,7 +85,8 @@
 ### 4. Student Directory & Profiles
 - **Academic Directory**: Filter students by enrolled course and current semester.
 - **Detailed Student Dossier**: View student registration data, contact channels, parent info, and academic credentials.
-- **Semester Promotion**: Direct controls to promote or demote student academic terms.
+- **Academic Promotion & Demotion**: In-app modal controls ([PromoteModal.tsx](src/features/Student/v1/Components/PromoteModal.tsx)) to promote or adjust student academic semesters (`/api/v1/Student/promote`, `/api/v1/Student/demote`), instantly triggering RabbitMQ queue events with automated HTML email dispatch via Nodemailer.
+- **Student Email Notification Dispatch**: Comprehensive modal ([SendNotificationModal.tsx](src/features/Student/v1/Components/SendNotificationModal.tsx)) with one-click Quick Templates (Fee Due, Exam Schedule, Academic Standing, Campus Notice), priority classification (Urgent, Normal, Advisory), and asynchronous background delivery.
 
 ### 5. Tuition Fees & Billing
 - **Account Ledger**: Search candidates by Unique ID (`EDNORA_...`) to inspect fee breakdowns and payment history.
