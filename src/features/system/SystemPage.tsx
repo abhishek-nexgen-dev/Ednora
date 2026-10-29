@@ -300,7 +300,7 @@ export default function SystemPage() {
                   className="w-full mt-1 px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-xs sm:text-sm font-mono text-indigo-300 focus:outline-none focus:border-indigo-500"
                 >
                   {queuesList.map((q) => (
-                    <option key={q.name} value={q.name}>
+                    <option key={q.name} value={q.name} className="bg-[#0C0D14] text-white font-sans">
                       {q.name} ({q.title})
                     </option>
                   ))}

@@ -845,13 +845,13 @@ export default function MediaPage() {
                   onChange={(e) => setImageForm({ ...imageForm, albumId: e.target.value })}
                   className="w-full mt-1 px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-indigo-500"
                 >
-                  <option value="" disabled>
+                  <option value="" disabled className="bg-[#0C0D14] text-zinc-500">
                     -- Select Target Album --
                   </option>
                   {albums.map((a) => {
                     const name = a.albumName || a.aName || "Album";
                     return (
-                      <option key={a._id} value={a._id}>
+                      <option key={a._id} value={a._id} className="bg-[#0C0D14] text-white">
                         {name}
                       </option>
                     );

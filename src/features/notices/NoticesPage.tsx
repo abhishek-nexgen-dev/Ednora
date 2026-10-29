@@ -485,10 +485,10 @@ Website: https://ednora.edu | Email: contact@ednora.edu`;
                     onChange={(e) => setFormData({ ...formData, type: e.target.value })}
                     className="w-full mt-1 px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-indigo-500"
                   >
-                    <option value="Announcement">Announcement</option>
-                    <option value="Holiday">Institutional Holiday</option>
-                    <option value="Exam">Examination Schedule</option>
-                    <option value="Event">Campus Event / Fest</option>
+                    <option value="Announcement" className="bg-[#0C0D14] text-white">Announcement</option>
+                    <option value="Holiday" className="bg-[#0C0D14] text-white">Institutional Holiday</option>
+                    <option value="Exam" className="bg-[#0C0D14] text-white">Examination Schedule</option>
+                    <option value="Event" className="bg-[#0C0D14] text-white">Campus Event / Fest</option>
                   </select>
                 </div>
                 <div>
@@ -498,9 +498,9 @@ Website: https://ednora.edu | Email: contact@ednora.edu`;
                     onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
                     className="w-full mt-1 px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-indigo-500"
                   >
-                    <option value="normal">Standard Notice</option>
-                    <option value="high">High Importance</option>
-                    <option value="urgent">Urgent Broadcast</option>
+                    <option value="normal" className="bg-[#0C0D14] text-white">Standard Notice</option>
+                    <option value="high" className="bg-[#0C0D14] text-white">High Importance</option>
+                    <option value="urgent" className="bg-[#0C0D14] text-white">Urgent Broadcast</option>
                   </select>
                 </div>
               </div>

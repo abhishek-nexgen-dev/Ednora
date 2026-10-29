@@ -4,6 +4,7 @@ import useStudentStore from "../../../Course/v1/store/student.store";
 import api from "../../../../Utils/api.utils";
 import { toast } from "react-toastify";
 import { BackendStudent } from "../../../../types/backend.types";
+import DropDown from "../../../../Components/DropDown";
 
 interface StudentFiltersProps {
   semesters: number[];
@@ -80,34 +81,27 @@ export function StudentFilters({ semesters, courses }: StudentFiltersProps) {
       <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 items-end">
         {/* Course */}
         <div className="lg:col-span-4">
-          <label className="mb-1.5 block text-xs font-semibold text-zinc-400">Academic Course</label>
-          <select
+          <DropDown
+            label="Academic Course"
+            options={courses}
             value={course}
-            onChange={(e) => setCourse(e.target.value)}
-            className="h-11 w-full rounded-xl border border-zinc-800 bg-zinc-900/90 px-3.5 text-xs sm:text-sm text-white focus:outline-none focus:border-indigo-500"
-          >
-            {courses.map((item) => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
-          </select>
+            onSelect={(val) => setCourse(String(val))}
+            className="w-full"
+          />
         </div>
 
         {/* Semester */}
         <div className="lg:col-span-2">
-          <label className="mb-1.5 block text-xs font-semibold text-zinc-400">Semester</label>
-          <select
+          <DropDown
+            label="Semester"
+            options={semesters.map((item) => ({
+              label: `Semester ${item}`,
+              value: item,
+            }))}
             value={semester}
-            onChange={(e) => setSemester(Number(e.target.value))}
-            className="h-11 w-full rounded-xl border border-zinc-800 bg-zinc-900/90 px-3.5 text-xs sm:text-sm text-white focus:outline-none focus:border-indigo-500"
-          >
-            {semesters.map((item) => (
-              <option key={item} value={item}>
-                Semester {item}
-              </option>
-            ))}
-          </select>
+            onSelect={(val) => setSemester(Number(val))}
+            className="w-full"
+          />
         </div>
 
         {/* Keyword Filter */}

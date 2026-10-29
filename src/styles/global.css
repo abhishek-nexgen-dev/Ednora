@@ -1,1 +1,34 @@
 @import "tailwindcss";
+
+:root {
+  color-scheme: dark;
+}
+
+html, body {
+  color-scheme: dark;
+  background-color: #07080C;
+  color: #FFFFFF;
+}
+
+/* Force dark theme styling across all native select and option elements */
+select {
+  color-scheme: dark !important;
+  background-color: #0C0D14;
+  color: #FFFFFF;
+}
+
+select option {
+  background-color: #0C0D14 !important;
+  color: #FFFFFF !important;
+}
+
+select option:checked {
+  background-color: #4F46E5 !important;
+  color: #FFFFFF !important;
+}
+
+select option:hover {
+  background-color: #1E1B4B !important;
+  color: #FFFFFF !important;
+}
+

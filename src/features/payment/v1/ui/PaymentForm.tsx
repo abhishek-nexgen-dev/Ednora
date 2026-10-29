@@ -110,10 +110,10 @@ function PaymentForm() {
             id={feeTypeId}
             value={feeType}
             onChange={(event) => setFeeType(event.target.value as FeeType)}
-            className="h-11 w-full rounded-xl border border-white/10 bg-black/40 px-3 text-sm text-white outline-none transition focus:border-violet-400/50"
+            className="h-11 w-full rounded-xl border border-white/10 bg-[#0C0D14] px-3 text-sm text-white outline-none transition focus:border-violet-400/50"
           >
             {FEE_TYPES.map((option) => (
-              <option key={option} value={option}>
+              <option key={option} value={option} className="bg-[#0C0D14] text-white">
                 {option}
               </option>
             ))}
@@ -128,10 +128,10 @@ function PaymentForm() {
             id={paymentMethodId}
             value={paymentMethod}
             onChange={(event) => setPaymentMethod(event.target.value as PaymentMethod)}
-            className="h-11 w-full rounded-xl border border-white/10 bg-black/40 px-3 text-sm text-white outline-none transition focus:border-violet-400/50"
+            className="h-11 w-full rounded-xl border border-white/10 bg-[#0C0D14] px-3 text-sm text-white outline-none transition focus:border-violet-400/50"
           >
             {PAYMENT_METHODS.map((option) => (
-              <option key={option} value={option}>
+              <option key={option} value={option} className="bg-[#0C0D14] text-white">
                 {option}
               </option>
             ))}

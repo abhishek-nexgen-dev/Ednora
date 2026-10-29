@@ -643,12 +643,12 @@ export default function AdmissionsPage() {
                 >
                   {courses.length > 0 ? (
                     courses.map((c) => (
-                      <option key={c._id || c.courseCode} value={c.courseName}>
+                      <option key={c._id || c.courseCode} value={c.courseName} className="bg-[#0C0D14] text-white">
                         {c.courseName} ({c.courseCode})
                       </option>
                     ))
                   ) : (
-                    <option value="Bachelor of Computer Applications (BCA)">Bachelor of Computer Applications (BCA)</option>
+                    <option value="Bachelor of Computer Applications (BCA)" className="bg-[#0C0D14] text-white">Bachelor of Computer Applications (BCA)</option>
                   )}
                 </select>
               </div>
