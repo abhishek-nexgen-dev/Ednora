@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import DropDown from "../../../../Components/DropDown";
+import { SlidersHorizontal } from "lucide-react";
 
 interface ManageCourseFilterProps {
   academicYears: string[];
@@ -8,7 +9,7 @@ interface ManageCourseFilterProps {
   onFilterChange?: (filters: Filters) => void;
 }
 
-interface Filters {
+export interface Filters {
   academicYear: string;
   department: string;
   programLevel: string;
@@ -42,15 +43,15 @@ const ManageCourseFilter: React.FC<ManageCourseFilterProps> = ({
     <div
       className="
         filter-bar 
-        border border-zinc-800 
-        bg-[#0d0d10] 
-        p-4 rounded-lg
-        flex flex-wrap items-center gap-4 text-white
-        "
+        border border-zinc-800/80 
+        bg-zinc-950/70 backdrop-blur-md
+        p-4 sm:p-5 rounded-2xl shadow-xl
+        flex flex-wrap items-end gap-4 text-white
+      "
       style={{ minWidth: 0 }}
     >
       {/* Academic Year */}
-      <div className="filter-item flex flex-col min-w-[140px] flex-grow sm:flex-grow-0">
+      <div className="filter-item flex flex-col min-w-[150px] flex-grow sm:flex-grow-0">
         <DropDown
           label="Academic Year"
           options={academicYears}
@@ -61,7 +62,7 @@ const ManageCourseFilter: React.FC<ManageCourseFilterProps> = ({
       </div>
 
       {/* Department */}
-      <div className="filter-item flex flex-col min-w-[180px] flex-grow sm:flex-grow-0">
+      <div className="filter-item flex flex-col min-w-[190px] flex-grow sm:flex-grow-0">
         <DropDown
           label="Department"
           options={["All Departments", ...departments]}
@@ -72,7 +73,7 @@ const ManageCourseFilter: React.FC<ManageCourseFilterProps> = ({
       </div>
 
       {/* Program Level */}
-      <div className="filter-item flex flex-col min-w-[140px] flex-grow sm:flex-grow-0">
+      <div className="filter-item flex flex-col min-w-[150px] flex-grow sm:flex-grow-0">
         <DropDown
           label="Program Level"
           options={["All Levels", ...programLevels]}
@@ -83,45 +84,37 @@ const ManageCourseFilter: React.FC<ManageCourseFilterProps> = ({
       </div>
 
       {/* Status Buttons */}
-      <div className="filter-item flex items-center gap-2 ml-auto flex-wrap">
-        {(["all", "active", "draft"] as Filters["status"][]).map((statusKey) => (
-          <button
-            key={statusKey}
-            type="button"
-            onClick={() => updateFilters({ status: statusKey })}
-            className={`px-4 py-2 rounded  border border-gray-500 font-semibold text-md whitespace-nowrap ${
-              filters.status === statusKey
-                ? "bg-black  text-white "
-                : " text-gray-300 hover:bg-gray-600"
-            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
-            aria-pressed={filters.status === statusKey}
-            aria-label={`Filter by status ${statusKey}`}
-          >
-            {statusKey.charAt(0).toUpperCase() + statusKey.slice(1)}
-          </button>
-        ))}
+      <div className="filter-item flex items-center gap-2 ml-auto flex-wrap pt-2 sm:pt-0">
+        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-zinc-900 border border-zinc-800">
+          {(["all", "active", "draft"] as Filters["status"][]).map((statusKey) => {
+            const isActive = filters.status === statusKey;
+            return (
+              <button
+                key={statusKey}
+                type="button"
+                onClick={() => updateFilters({ status: statusKey })}
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+                  isActive
+                    ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/20"
+                    : "text-zinc-400 hover:text-white hover:bg-zinc-800/60"
+                }`}
+                aria-pressed={isActive}
+                aria-label={`Filter by status ${statusKey}`}
+              >
+                {statusKey.charAt(0).toUpperCase() + statusKey.slice(1)}
+              </button>
+            );
+          })}
+        </div>
 
-        {/* Filter Icon Button */}
+        {/* Filter Indicator Icon Button */}
         <button
           type="button"
-          aria-label="Open filter settings"
-          className="ml-2 p-2 rounded bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          aria-label="Filter status indicator"
+          title="Active Filters"
+          className="p-2.5 rounded-xl border border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-white hover:bg-zinc-800 transition"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5 text-gray-300"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-            aria-hidden="true"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L15 13.414V19a1 1 0 01-1.447.894l-4-2A1 1 0 019 17v-3.586L3.293 6.707A1 1 0 013 6V4z"
-            />
-          </svg>
+          <SlidersHorizontal size={16} />
         </button>
       </div>
     </div>

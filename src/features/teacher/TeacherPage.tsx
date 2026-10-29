@@ -623,7 +623,7 @@ export default function TeacherPage() {
                       setFormData({ ...formData, department: e.target.value });
                       setFormErrors((prev) => ({ ...prev, department: "" }));
                     }}
-                    className="w-full mt-1 px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500"
+                    className="w-full mt-1 px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition"
                   >
                     <option value="Computer Science & Engineering">Computer Science & Engineering</option>
                     <option value="Information Technology">Information Technology</option>
@@ -679,7 +679,7 @@ export default function TeacherPage() {
                     placeholder="+91 94311 00000"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full mt-1 px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500"
+                    className="w-full mt-1 px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition"
                   />
                 </div>
               </div>

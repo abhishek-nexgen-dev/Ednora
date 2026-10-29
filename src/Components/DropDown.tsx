@@ -1,16 +1,33 @@
 import React, { useEffect, useRef, useState, KeyboardEvent } from "react";
-import { FaChevronDown } from "react-icons/fa";
+import { ChevronDown, Check } from "lucide-react";
 import clsx from "clsx";
 
-type DropDownProps = {
-  options: string[] | number[];
+export type DropDownOption = string | number | { label: string; value: string | number };
+
+export type DropDownProps = {
+  options: DropDownOption[];
   label?: string;
   error?: string;
   onSelect: (option: string | number) => void;
   className?: string;
-  value?: string;
+  value?: string | number;
   placeholder?: string;
   disabled?: boolean;
+  required?: boolean;
+};
+
+const getOptionValue = (opt: DropDownOption): string | number => {
+  if (typeof opt === "object" && opt !== null && "value" in opt) {
+    return opt.value;
+  }
+  return opt;
+};
+
+const getOptionLabel = (opt: DropDownOption): string => {
+  if (typeof opt === "object" && opt !== null && "label" in opt) {
+    return opt.label;
+  }
+  return String(opt);
 };
 
 const DropDown: React.FC<DropDownProps> = ({
@@ -21,12 +38,19 @@ const DropDown: React.FC<DropDownProps> = ({
   value,
   placeholder = "Select an option",
   disabled = false,
+  required = false,
   error,
 }) => {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const displayedValue = value !== undefined ? value : (options[0] ?? "");
+  // Determine current label to display
+  const currentOpt = options.find((opt) => String(getOptionValue(opt)) === String(value));
+  const displayedLabel = currentOpt
+    ? getOptionLabel(currentOpt)
+    : value !== undefined && value !== ""
+    ? String(value)
+    : "";
 
   useEffect(() => {
     const onClickOutside = (e: MouseEvent) => {
@@ -36,16 +60,15 @@ const DropDown: React.FC<DropDownProps> = ({
     };
 
     document.addEventListener("mousedown", onClickOutside);
-
     return () => {
       document.removeEventListener("mousedown", onClickOutside);
     };
   }, []);
 
-  const handleSelect = (opt: string | number) => {
+  const handleSelect = (opt: DropDownOption) => {
     if (disabled) return;
-
-    onSelect(opt);
+    const val = getOptionValue(opt);
+    onSelect(val);
     setOpen(false);
   };
 
@@ -64,24 +87,23 @@ const DropDown: React.FC<DropDownProps> = ({
         break;
 
       case "ArrowDown":
+        e.preventDefault();
         if (!open) setOpen(true);
+        break;
+
+      case "ArrowUp":
+        e.preventDefault();
+        if (open) setOpen(false);
         break;
     }
   };
 
   return (
-    <div ref={containerRef} className={clsx("space-y-2 relative w-full", className)}>
+    <div ref={containerRef} className={clsx("space-y-1.5 relative w-full", className)}>
       {label && (
-        <label
-          className="
-            block
-            text-xs
-            uppercase
-            tracking-[0.2em]
-            text-zinc-500
-          "
-        >
+        <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-400">
           {label}
+          {required && <span className="ml-1 text-rose-400">*</span>}
         </label>
       )}
 
@@ -93,39 +115,29 @@ const DropDown: React.FC<DropDownProps> = ({
         aria-haspopup="listbox"
         aria-expanded={open}
         className={clsx(
-          `
-          flex
-          h-12
-          w-full
-          items-center
-          justify-between
-          gap-3
-          rounded-lg
-          border
-          bg-zinc-900/50
-          px-4
-          text-sm
-          transition-all
-          outline-none
-          `,
-          error ? "border-red-500" : "border-zinc-800 focus-within:border-blue-500",
-          !error && "focus-within:ring-2 focus-within:ring-blue-500/20",
-          disabled && "cursor-not-allowed opacity-60",
+          "flex h-11 w-full items-center justify-between gap-2.5 rounded-xl border px-3.5 text-xs sm:text-sm font-medium transition-all outline-none",
+          error
+            ? "border-rose-500/80 bg-rose-950/20 text-rose-200 ring-2 ring-rose-500/20"
+            : open
+            ? "border-indigo-500 bg-zinc-900 text-white ring-2 ring-indigo-500/25 shadow-lg shadow-indigo-500/10"
+            : "border-zinc-800 bg-zinc-900/70 hover:border-zinc-700 hover:bg-zinc-900 text-zinc-100",
+          disabled && "cursor-not-allowed opacity-50 bg-zinc-950",
         )}
       >
         <span
           className={clsx(
             "flex-1 truncate text-left",
-            displayedValue ? "text-zinc-100" : "text-zinc-600",
+            displayedLabel ? "text-zinc-100 font-medium" : "text-zinc-500",
           )}
         >
-          {displayedValue || placeholder}
+          {displayedLabel || placeholder}
         </span>
 
-        <FaChevronDown
+        <ChevronDown
+          size={16}
           className={clsx(
-            "shrink-0 text-zinc-500 transition-transform duration-200",
-            open && "rotate-180",
+            "shrink-0 text-zinc-400 transition-transform duration-200",
+            open && "rotate-180 text-indigo-400",
           )}
         />
       </button>
@@ -133,41 +145,28 @@ const DropDown: React.FC<DropDownProps> = ({
       {open && options.length > 0 && (
         <ul
           role="listbox"
-          className="
-            absolute
-            z-20
-            mt-2
-            w-full
-            max-h-60
-            overflow-y-auto
-            rounded-lg
-            border
-            border-zinc-800
-            bg-zinc-900
-            shadow-lg
-          "
+          tabIndex={-1}
+          className="absolute z-50 mt-1.5 w-full max-h-60 overflow-y-auto rounded-2xl border border-zinc-800/90 bg-[#0C0D14]/95 backdrop-blur-xl shadow-2xl p-1.5 space-y-0.5 animate-fadeIn outline-none"
         >
-          {options.map((opt) => {
-            const isSelected = displayedValue === opt;
+          {options.map((opt, idx) => {
+            const val = getOptionValue(opt);
+            const optLabel = getOptionLabel(opt);
+            const isSelected = String(val) === String(value);
 
             return (
-              <li key={opt} role="option" aria-selected={isSelected}>
+              <li key={`${val}-${idx}`} role="option" aria-selected={isSelected}>
                 <button
                   type="button"
                   onClick={() => handleSelect(opt)}
                   className={clsx(
-                    `
-                    w-full
-                    px-4
-                    py-3
-                    text-left
-                    text-sm
-                    transition-colors
-                    `,
-                    isSelected ? "bg-blue-500/10 text-blue-400" : "text-zinc-200 hover:bg-zinc-800",
+                    "w-full px-3 py-2 rounded-xl text-left text-xs sm:text-sm font-medium transition-all flex items-center justify-between",
+                    isSelected
+                      ? "bg-indigo-600/15 text-indigo-400 font-semibold border border-indigo-500/30 shadow-sm"
+                      : "text-zinc-300 hover:text-white hover:bg-zinc-800/60 border border-transparent",
                   )}
                 >
-                  {opt}
+                  <span className="truncate">{optLabel}</span>
+                  {isSelected && <Check size={14} className="text-indigo-400 shrink-0 ml-2" />}
                 </button>
               </li>
             );
@@ -175,7 +174,7 @@ const DropDown: React.FC<DropDownProps> = ({
         </ul>
       )}
 
-      {error && <p className="text-xs text-red-400">{error}</p>}
+      {error && <p className="text-xs text-rose-400 mt-1 font-medium">{error}</p>}
     </div>
   );
 };

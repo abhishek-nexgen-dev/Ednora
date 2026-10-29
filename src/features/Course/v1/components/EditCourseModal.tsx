@@ -258,11 +258,11 @@ export const EditCourseModal: React.FC<EditCourseModalProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="text-xs text-zinc-400">Department *</label>
+              <label className="text-xs font-medium text-zinc-400">Department *</label>
               <select
                 value={formData.Department}
                 onChange={(e) => setFormData({ ...formData, Department: e.target.value })}
-                className="w-full mt-1 px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500"
+                className="w-full mt-1 px-3.5 py-2.5 bg-zinc-900/90 border border-zinc-800 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition"
               >
                 <option value="Computer Science">Computer Science</option>
                 <option value="Information Technology">Information Technology</option>
@@ -275,11 +275,11 @@ export const EditCourseModal: React.FC<EditCourseModalProps> = ({
               </select>
             </div>
             <div>
-              <label className="text-xs text-zinc-400">Mode *</label>
+              <label className="text-xs font-medium text-zinc-400">Mode *</label>
               <select
                 value={formData.mode}
                 onChange={(e) => setFormData({ ...formData, mode: e.target.value })}
-                className="w-full mt-1 px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500"
+                className="w-full mt-1 px-3.5 py-2.5 bg-zinc-900/90 border border-zinc-800 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition"
               >
                 <option value="Hybrid">Hybrid</option>
                 <option value="Offline">Offline</option>
