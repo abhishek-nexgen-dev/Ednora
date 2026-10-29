@@ -13,6 +13,8 @@ import {
   X,
   FileText,
   AlertTriangle,
+  Copy,
+  Check,
 } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import api, { getErrorMessage } from "../../Utils/api.utils";
@@ -23,6 +25,7 @@ interface AdminRecord {
   name: string;
   email: string;
   role: string;
+  designation?: string;
   isActive: boolean;
   createdAt?: string | Date;
 }
@@ -36,6 +39,7 @@ export default function AdminPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [copiedEmail, setCopiedEmail] = useState<string | null>(null);
 
   // New admin form state
   const [formData, setFormData] = useState({
@@ -67,10 +71,30 @@ export default function AdminPage() {
       if (fetched.length > 0) {
         setAdmins(fetched);
       } else {
-        setAdmins(DEFAULT_ADMINS);
+        // Fallback: if server returned empty, ensure at least the logged-in admin is shown
+        const fallbackAdmin: AdminRecord = {
+          _id: "root-admin",
+          name: currentUser?.name || "Super Administrator",
+          email: currentUser?.email || "admin@gmail.com",
+          role: "admin",
+          designation: "Chief Administrative Officer",
+          isActive: true,
+          createdAt: new Date().toISOString(),
+        };
+        setAdmins([fallbackAdmin]);
       }
     } catch {
-      setAdmins(DEFAULT_ADMINS);
+      // In case of offline database, supply current session admin
+      const fallbackAdmin: AdminRecord = {
+        _id: "root-admin",
+        name: currentUser?.name || "Super Administrator",
+        email: currentUser?.email || "admin@gmail.com",
+        role: "admin",
+        designation: "Chief Administrative Officer",
+        isActive: true,
+        createdAt: new Date().toISOString(),
+      };
+      setAdmins([fallbackAdmin]);
     } finally {
       setLoading(false);
     }
@@ -79,6 +103,13 @@ export default function AdminPage() {
   useEffect(() => {
     fetchAdmins();
   }, []);
+
+  const handleCopyEmail = (email: string) => {
+    navigator.clipboard.writeText(email);
+    setCopiedEmail(email);
+    toast.info(`Copied ${email} to clipboard.`);
+    setTimeout(() => setCopiedEmail(null), 2000);
+  };
 
   const handleCreateAdmin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,18 +120,23 @@ export default function AdminPage() {
 
     setSubmitting(true);
     try {
+      const payload = {
+        name: formData.name.trim(),
+        email: formData.email.trim().toLowerCase(),
+        password: formData.password || "Admin@123",
+        role: "admin",
+        designation: formData.designation,
+      };
+
       try {
-        await api.post("/api/v1/auth/Admin/SignUp", {
-          name: formData.name.trim(),
-          email: formData.email.trim().toLowerCase(),
-          password: formData.password || "Admin@123",
-          role: "admin",
-        });
-      } catch {
-        // Fallback to role grant endpoint
-        await api.post("/api/v1/role/create", {
-          email: formData.email.trim().toLowerCase(),
-        });
+        await api.post("/api/v1/role/create", payload);
+      } catch (err: unknown) {
+        const errStatus = (err as { response?: { status?: number } })?.response?.status;
+        if (errStatus === 404 || errStatus === 405) {
+          await api.post("/api/v1/admin/create", payload);
+        } else {
+          throw err;
+        }
       }
 
       toast.success(`Administrator "${formData.name}" inducted successfully!`);
@@ -132,7 +168,7 @@ export default function AdminPage() {
 
     try {
       try {
-        await api.delete(`/api/v1/admin/delete/${admin._id}`);
+        await api.delete(`/api/v1/admin/delete/${encodeURIComponent(admin._id)}`);
       } catch {
         await api.delete(`/api/v1/role/delete/${encodeURIComponent(admin.email)}`);
       }
@@ -149,6 +185,7 @@ export default function AdminPage() {
     return (
       a.name.toLowerCase().includes(q) ||
       a.email.toLowerCase().includes(q) ||
+      (a.designation || "").toLowerCase().includes(q) ||
       a.role.toLowerCase().includes(q)
     );
   });
@@ -176,7 +213,7 @@ export default function AdminPage() {
             <button
               onClick={fetchAdmins}
               disabled={loading}
-              className="p-2.5 rounded-xl border border-zinc-800 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white transition"
+              className="p-2.5 rounded-xl border border-zinc-800 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white transition disabled:opacity-50"
               title="Refresh Directory"
             >
               <RefreshCw size={16} className={loading ? "animate-spin text-indigo-400" : ""} />
@@ -242,7 +279,7 @@ export default function AdminPage() {
               <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" />
               <input
                 type="text"
-                placeholder="Search administrators by name, email, or role..."
+                placeholder="Search administrators by name, email, or department..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500"
@@ -268,7 +305,14 @@ export default function AdminPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-900 text-xs sm:text-sm">
-                {filteredAdmins.length === 0 ? (
+                {loading && admins.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="py-12 text-center text-zinc-500">
+                      <RefreshCw size={24} className="animate-spin text-indigo-400 mx-auto mb-2" />
+                      Loading authorized administrators...
+                    </td>
+                  </tr>
+                ) : filteredAdmins.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="py-12 text-center text-zinc-500">
                       No administrators matching "{searchTerm}".
@@ -290,16 +334,27 @@ export default function AdminPage() {
                             <div className="min-w-0">
                               <p className="font-semibold text-white truncate">{admin.name}</p>
                               <p className="text-[11px] text-zinc-500">
-                                {isRoot ? "Head of Institution / IT Director" : "Campus Administrative Officer"}
+                                {admin.designation || (isRoot ? "Head of Institution / IT Director" : "Campus Administrative Officer")}
                               </p>
                             </div>
                           </div>
                         </td>
 
                         <td className="px-5 py-4 font-mono text-xs text-zinc-300">
-                          <div className="flex items-center gap-1.5">
+                          <div className="flex items-center gap-2">
                             <Mail size={13} className="text-zinc-500 shrink-0" />
                             <span className="truncate">{admin.email}</span>
+                            <button
+                              onClick={() => handleCopyEmail(admin.email)}
+                              className="text-zinc-500 hover:text-zinc-300 p-1 rounded"
+                              title="Copy Email"
+                            >
+                              {copiedEmail === admin.email ? (
+                                <Check size={12} className="text-emerald-400" />
+                              ) : (
+                                <Copy size={12} />
+                              )}
+                            </button>
                           </div>
                         </td>
 
@@ -463,7 +518,7 @@ export default function AdminPage() {
                 >
                   <option value="Academic Administrator">Academic Administrator</option>
                   <option value="Admissions Director">Admissions Director</option>
-                  <option value="Registrar">Registrar & Controller of Examinations</option>
+                  <option value="Registrar & Controller of Examinations">Registrar & Controller of Examinations</option>
                   <option value="Finance & Comptroller">Finance & Comptroller</option>
                   <option value="IT Operations Lead">IT Operations Lead</option>
                 </select>
@@ -492,4 +547,3 @@ export default function AdminPage() {
     </div>
   );
 }
-
