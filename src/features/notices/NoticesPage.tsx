@@ -71,25 +71,6 @@ export default function NoticesPage() {
     });
   }, [notices, searchTerm, typeFilter]);
 
-  // Create text document blob if no file is uploaded
-  const createNoticeDocBlob = (title: string, content: string): Blob => {
-    const docText = `EDNORA — WHERE KNOWLEDGE FINDS ITS FUTURE
-OFFICIAL CIRCULAR / NOTIFICATION
-==================================================
-Subject: ${title}
-Issued Date: ${new Date().toLocaleDateString()}
-Category: Announcement / Academic Notice
-
-NOTICE CONTENT:
-${content}
-
---------------------------------------------------
-Admissions & Academic Administration Office
-Ednora Campus Directorate
-Website: https://ednora.edu | Email: contact@ednora.edu`;
-    return new Blob([docText], { type: "text/plain" });
-  };
-
   const handleCreateNotice = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.title.trim() || !formData.noticeContent.trim()) {
@@ -109,10 +90,8 @@ Website: https://ednora.edu | Email: contact@ednora.edu`;
 
       if (formData.file) {
         formPayload.append("doc", formData.file);
-      } else {
-        const textBlob = createNoticeDocBlob(formData.title.trim(), formData.noticeContent.trim());
-        const filename = `${formData.title.trim().replace(/[^a-zA-Z0-9]/g, "_")}_memo.txt`;
-        formPayload.append("doc", textBlob, filename);
+      } else if (formData.doc_link) {
+        formPayload.append("doc_link", formData.doc_link);
       }
 
       const res = await api.post("/api/v1/notice/create", formPayload, {
@@ -544,7 +523,7 @@ Website: https://ednora.edu | Email: contact@ednora.edu`;
                   className="w-full mt-1 px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-zinc-400 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500"
                 />
                 <p className="text-[11px] text-zinc-500 mt-1">
-                  If left empty, an official formatted text memo is generated automatically for backend storage.
+                  Optional. Upload a PDF, document, or image circular. If omitted, no document will be stored.
                 </p>
               </div>
 
