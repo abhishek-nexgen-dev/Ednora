@@ -121,6 +121,7 @@ export default function CourseDetailsPage() {
             activeCourse.image ||
             "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1600"
           }
+          logo={activeCourse.courseLogo || activeCourse.logo}
           duration={activeCourse.courseDuration || activeCourse.duration || "3 Years"}
           mode={activeCourse.mode || "Full Time"}
         />

@@ -37,6 +37,13 @@ const CourseForm = () => {
         formData.append("courseThumbnail", data.courseImage);
       }
 
+      if (data.courseLogo instanceof File) {
+        formData.append("courseLogo", data.courseLogo);
+        formData.append("logo", data.courseLogo);
+      } else if (typeof data.courseLogo === "string" && data.courseLogo) {
+        formData.append("courseLogo", data.courseLogo);
+      }
+
       const validCriteria = (data.AdmissionCriteria || [])
         .map((c) => (typeof c === "string" ? c.trim() : ""))
         .filter(Boolean);

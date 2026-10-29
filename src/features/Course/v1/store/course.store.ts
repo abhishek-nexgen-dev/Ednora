@@ -13,7 +13,9 @@ export interface Course {
   description?: string;
   courseDescription?: string;
   courseThumbnail?: string;
+  courseLogo?: string;
   image?: string;
+  logo?: string;
   mode?: string;
   seats?: number;
   Department?: string;

@@ -65,7 +65,9 @@ export interface BackendCourse {
   courseEligibility?: string;
   eligibility?: string;
   courseThumbnail?: string;
+  courseLogo?: string;
   image?: string;
+  logo?: string;
   coursePrice?: number;
   fee?: number;
   numberOfStudentsEnrolled?: number;

@@ -23,6 +23,12 @@ export const EditCourseModal: React.FC<EditCourseModalProps> = ({
   );
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string>(
+    course.courseLogo || course.logo || ""
+  );
+  const logoInputRef = useRef<HTMLInputElement | null>(null);
+
   const [formData, setFormData] = useState({
     courseName: course.courseName || "",
     courseCode: course.courseCode || "",
@@ -81,10 +87,11 @@ export const EditCourseModal: React.FC<EditCourseModalProps> = ({
       description: formData.courseDescription.trim(),
       AdmissionCriteria: safeCriteria,
       courseThumbnail: thumbnailPreview || course.courseThumbnail || course.image || "",
+      courseLogo: logoPreview || course.courseLogo || course.logo || "",
     };
 
     try {
-      if (thumbnailFile) {
+      if (thumbnailFile || logoFile) {
         // Multipart upload when new image file is chosen
         const payload = new FormData();
         payload.append("courseName", formData.courseName.trim());
@@ -97,7 +104,18 @@ export const EditCourseModal: React.FC<EditCourseModalProps> = ({
         payload.append("seats", String(formData.seats || 60));
         payload.append("courseDescription", formData.courseDescription.trim());
         safeCriteria.forEach((crit) => payload.append("AdmissionCriteria", crit));
-        payload.append("courseThumbnail", thumbnailFile);
+
+        if (thumbnailFile) {
+          payload.append("courseThumbnail", thumbnailFile);
+        } else if (thumbnailPreview) {
+          payload.append("courseThumbnail", thumbnailPreview);
+        }
+
+        if (logoFile) {
+          payload.append("courseLogo", logoFile);
+        } else if (logoPreview) {
+          payload.append("courseLogo", logoPreview);
+        }
 
         try {
           await api.put(`/api/v1/admin/course/${encodeURIComponent(targetId)}/update`, payload);
@@ -127,6 +145,7 @@ export const EditCourseModal: React.FC<EditCourseModalProps> = ({
           description: formData.courseDescription.trim(),
           AdmissionCriteria: safeCriteria,
           courseThumbnail: thumbnailPreview || course.courseThumbnail || course.image || "",
+          courseLogo: logoPreview || course.courseLogo || course.logo || "",
         };
 
         try {
@@ -175,60 +194,121 @@ export const EditCourseModal: React.FC<EditCourseModalProps> = ({
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Banner Upload Option */}
-          <div>
-            <label className="text-xs font-semibold text-zinc-300 block mb-1.5">
-              Course Banner Image
-            </label>
+          {/* Dual Visual Assets: Banner & Logo */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-3 rounded-2xl bg-zinc-900/60 border border-zinc-800">
+            {/* 1. Banner Upload */}
+            <div>
+              <label className="text-xs font-semibold text-zinc-300 block mb-1.5">
+                1. Course Banner (Header)
+              </label>
 
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              className="hidden"
-            />
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
+              />
 
-            <div className="flex items-center gap-4">
-              <div
-                onClick={() => fileInputRef.current?.click()}
-                className="w-28 h-20 rounded-2xl overflow-hidden bg-zinc-900 border-2 border-dashed border-indigo-500/40 hover:border-indigo-400 cursor-pointer flex flex-col items-center justify-center shrink-0 transition"
-              >
-                {thumbnailPreview ? (
-                  <img
-                    src={thumbnailPreview}
-                    alt="Preview"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <>
-                    <Upload size={20} className="text-indigo-400" />
-                    <span className="text-[10px] text-zinc-400 mt-1">Upload</span>
-                  </>
-                )}
-              </div>
-
-              <div className="flex-1 space-y-1.5">
-                <button
-                  type="button"
+              <div className="flex items-center gap-3">
+                <div
                   onClick={() => fileInputRef.current?.click()}
-                  className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs font-semibold text-white transition flex items-center gap-1.5"
+                  className="w-24 h-16 rounded-xl overflow-hidden bg-zinc-900 border-2 border-dashed border-indigo-500/40 hover:border-indigo-400 cursor-pointer flex flex-col items-center justify-center shrink-0 transition"
                 >
-                  <ImageIcon size={14} /> Change Banner Image
-                </button>
-                <p className="text-[11px] text-zinc-400">
-                  Recommended size: 1200x600px.
-                </p>
-                <input
-                  type="text"
-                  placeholder="Or enter banner image URL (https://...)"
-                  value={thumbnailPreview}
-                  onChange={(e) => {
-                    setThumbnailPreview(e.target.value);
-                    setThumbnailFile(null);
-                  }}
-                  className="w-full px-2.5 py-1.5 bg-zinc-900 border border-zinc-800 rounded-lg text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-indigo-500"
-                />
+                  {thumbnailPreview ? (
+                    <img
+                      src={thumbnailPreview}
+                      alt="Banner Preview"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <>
+                      <Upload size={18} className="text-indigo-400" />
+                      <span className="text-[9px] text-zinc-400 mt-0.5">Banner</span>
+                    </>
+                  )}
+                </div>
+
+                <div className="flex-1 min-w-0 space-y-1">
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-[11px] font-semibold text-white transition flex items-center gap-1"
+                  >
+                    <ImageIcon size={12} /> Upload Banner
+                  </button>
+                  <input
+                    type="text"
+                    placeholder="Or banner URL..."
+                    value={thumbnailPreview}
+                    onChange={(e) => {
+                      setThumbnailPreview(e.target.value);
+                      setThumbnailFile(null);
+                    }}
+                    className="w-full px-2 py-1 bg-zinc-900 border border-zinc-800 rounded-lg text-[11px] text-white placeholder-zinc-600 focus:outline-none focus:border-indigo-500"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* 2. Logo Upload */}
+            <div>
+              <label className="text-xs font-semibold text-zinc-300 block mb-1.5">
+                2. Course Logo (Badge)
+              </label>
+
+              <input
+                ref={logoInputRef}
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    setLogoFile(file);
+                    setLogoPreview(URL.createObjectURL(file));
+                  }
+                }}
+                className="hidden"
+              />
+
+              <div className="flex items-center gap-3">
+                <div
+                  onClick={() => logoInputRef.current?.click()}
+                  className="w-16 h-16 rounded-xl overflow-hidden bg-zinc-900 border-2 border-dashed border-indigo-500/40 hover:border-indigo-400 cursor-pointer flex flex-col items-center justify-center shrink-0 transition"
+                >
+                  {logoPreview ? (
+                    <img
+                      src={logoPreview}
+                      alt="Logo Preview"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <>
+                      <Upload size={18} className="text-indigo-400" />
+                      <span className="text-[9px] text-zinc-400 mt-0.5">Logo</span>
+                    </>
+                  )}
+                </div>
+
+                <div className="flex-1 min-w-0 space-y-1">
+                  <button
+                    type="button"
+                    onClick={() => logoInputRef.current?.click()}
+                    className="px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-[11px] font-semibold text-white transition flex items-center gap-1"
+                  >
+                    <ImageIcon size={12} /> Upload Logo
+                  </button>
+                  <input
+                    type="text"
+                    placeholder="Or logo URL..."
+                    value={logoPreview}
+                    onChange={(e) => {
+                      setLogoPreview(e.target.value);
+                      setLogoFile(null);
+                    }}
+                    className="w-full px-2 py-1 bg-zinc-900 border border-zinc-800 rounded-lg text-[11px] text-white placeholder-zinc-600 focus:outline-none focus:border-indigo-500"
+                  />
+                </div>
               </div>
             </div>
           </div>

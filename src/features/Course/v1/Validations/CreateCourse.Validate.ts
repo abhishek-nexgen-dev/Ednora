@@ -10,6 +10,7 @@ export const CreateCourseValidation = z.object({
   courseEligibility: z.string().min(1, "Course eligibility is required").default("10+2 or Equivalent"),
   coursePrice: z.coerce.number().min(0),
   courseImage: z.any().optional(),
+  courseLogo: z.any().optional(),
   Department: z.string().min(1, "Department is required"),
   AdmissionCriteria: z.array(z.string()).optional().default(["10+2 with minimum 50% marks"]),
   RequiredDocuments: z.array(z.string()).optional().default(["Class 10 & 12 Marksheets", "Photo ID"]),

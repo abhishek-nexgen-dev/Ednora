@@ -36,9 +36,24 @@ const CourseTableRow: React.FC<CourseTableRowProps> = ({ course, onEdit }) => {
         {course.courseCode}
       </td>
       <td className="px-4 py-3.5">
-        <div className="font-semibold text-sm text-white">{course.courseName}</div>
-        <div className="text-xs text-zinc-500 mt-0.5">
-          {course.Department || "Engineering & Technology"}
+        <div className="flex items-center gap-3">
+          {course.courseLogo || course.courseThumbnail ? (
+            <img
+              src={course.courseLogo || course.courseThumbnail}
+              alt=""
+              className="w-8 h-8 rounded-lg object-cover border border-zinc-800 shrink-0 bg-zinc-900"
+            />
+          ) : (
+            <div className="w-8 h-8 rounded-lg bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 font-bold text-xs flex items-center justify-center shrink-0">
+              {course.courseName.charAt(0).toUpperCase()}
+            </div>
+          )}
+          <div className="min-w-0">
+            <div className="font-semibold text-sm text-white truncate">{course.courseName}</div>
+            <div className="text-xs text-zinc-500 truncate">
+              {course.Department || "Engineering & Technology"}
+            </div>
+          </div>
         </div>
       </td>
       <td className="px-4 py-3.5 font-mono text-xs text-zinc-300">

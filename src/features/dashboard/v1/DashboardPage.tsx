@@ -42,12 +42,12 @@ const DashboardPage = () => {
   const [tauriGreetResult, setTauriGreetResult] = useState<string | null>(null);
 
   const [stats, setStats] = useState({
-    courseCount: 4,
-    albumCount: 1,
-    imageCount: 3,
-    contactCount: 4,
-    admissionCount: 12,
-    earnings: 485000,
+    courseCount: 0,
+    albumCount: 0,
+    imageCount: 0,
+    contactCount: 0,
+    admissionCount: 0,
+    earnings: 0,
   });
 
   useEffect(() => {
@@ -591,6 +591,22 @@ const DashboardPage = () => {
                     <div>
                       <p className="text-xs font-semibold text-white">Photo Gallery & Albums</p>
                       <p className="text-[11px] text-zinc-500">Manage event digital assets</p>
+                    </div>
+                  </div>
+                  <ArrowRight size={14} className="text-zinc-500 group-hover:text-indigo-400 transition" />
+                </Link>
+
+                <Link
+                  to="/admin"
+                  className="flex items-center justify-between p-3 sm:p-3.5 rounded-2xl bg-zinc-900/70 border border-zinc-800/80 hover:bg-zinc-800/60 hover:border-indigo-500/40 transition group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20 group-hover:scale-105 transition-transform">
+                      <ShieldCheck size={16} />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-white">Portal Administrators</p>
+                      <p className="text-[11px] text-zinc-500">Manage security clearances & roles</p>
                     </div>
                   </div>
                   <ArrowRight size={14} className="text-zinc-500 group-hover:text-indigo-400 transition" />

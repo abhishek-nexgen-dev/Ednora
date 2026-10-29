@@ -5,6 +5,7 @@ interface CourseHeroProps {
   title: string;
   department: string;
   image?: string;
+  logo?: string;
   duration?: string;
   mode?: string;
 }
@@ -13,6 +14,7 @@ export default function CourseHero({
   title,
   department,
   image = "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1600",
+  logo,
   duration = "3 Years",
   mode = "Full Time",
 }: CourseHeroProps) {
@@ -22,15 +24,25 @@ export default function CourseHero({
       <img src={image} alt={title} className="absolute inset-0 h-full w-full object-cover" />
 
       {/* Dark Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#07080C] via-[#07080C]/80 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#07080C] via-[#07080C]/85 to-transparent" />
 
       {/* Content */}
       <div className="relative z-10 w-full p-4 sm:p-6 lg:p-8">
-        <Badge>Academic Program Specification</Badge>
-
-        <h1 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight text-white">
-          {title}
-        </h1>
+        <div className="flex items-center gap-3.5 sm:gap-4">
+          {logo && (
+            <img
+              src={logo}
+              alt={`${title} Logo`}
+              className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl object-cover border-2 border-indigo-500/40 shadow-2xl bg-zinc-950/90 shrink-0"
+            />
+          )}
+          <div className="min-w-0">
+            <Badge>Academic Program Specification</Badge>
+            <h1 className="mt-1 text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight text-white truncate">
+              {title}
+            </h1>
+          </div>
+        </div>
 
         <div className="mt-2.5 flex items-center gap-2 text-xs sm:text-sm text-zinc-300">
           <Building2 size={16} className="text-indigo-400" />

@@ -21,6 +21,7 @@ const MediaPage = lazy(() => import("../features/media/MediaPage"));
 const TestimonialsPage = lazy(() => import("../features/testimonials/TestimonialsPage"));
 const SystemPage = lazy(() => import("../features/system/SystemPage"));
 const SettingsPage = lazy(() => import("../features/settings/SettingsPage"));
+const AdminPage = lazy(() => import("../features/admin/AdminPage"));
 
 const PageFallback = () => (
   <div className="flex min-h-[60vh] w-full flex-col items-center justify-center gap-3 text-zinc-400">
@@ -53,6 +54,7 @@ export function AppRoutes() {
           <Route path="media" element={<MediaPage />} />
           <Route path="testimonials" element={<TestimonialsPage />} />
           <Route path="system" element={<SystemPage />} />
+          <Route path="admin" element={<AdminPage />} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Route>

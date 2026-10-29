@@ -10,6 +10,7 @@ import {
   Images,
   Quote,
   Activity,
+  ShieldCheck,
   Settings,
 } from "lucide-react";
 
@@ -91,6 +92,13 @@ export const sidebarConfig: SidebarItemConfig[] = [
     icon: Activity,
     path: "/system",
     badge: "Live",
+  },
+  {
+    id: "admins",
+    title: "Portal Admins",
+    icon: ShieldCheck,
+    path: "/admin",
+    badge: "Security",
   },
   {
     id: "settings",
